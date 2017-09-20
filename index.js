@@ -8,7 +8,7 @@ const isType = (...types)=>(e)=>types.includes(e.type);
 
 const parseSelector = (selector) => selector.match(/([\w-]+)/g).join('-');
 
-const removeRootCSS = (style) => style.replace(/ *:root([\s\S]*?)}/gm,'');
+const removeRootCSS = (style) => style.replace(/:root/g,':host > *');
 
 const callback = (e)=> {
     switch (e.name) {
@@ -53,7 +53,7 @@ const traverseItem = (node)=> {
     }
 };
 
-const file = fs.createWriteStream('./build/' + inputFile);
+const file = fs.createWriteStream('./output/' + inputFile);
 
 const src = fs.readFile(inputFile, 'utf8', function (err, html) {
     if (err) {
