@@ -1,0 +1,28 @@
+{
+  "name": "polymer2-migrator",
+  "version": "1.0.0",
+  "description": "Migrate your Polymer 1.x components to hybrid and/or Polymer 2.x components",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/albelop/polymer2-migrator.git"
+  },
+  "keywords": [
+    "web-components",
+    "polymer2",
+    "polymer",
+    "hybrid",
+    "migrate",
+    "migration",
+    "upgrade"
+  ],
+  "author": "Alberto López-Barranco",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/albelop/polymer2-migrator/issues"
+  },
+  "homepage": "https://github.com/albelop/polymer2-migrator#readme"
+}
