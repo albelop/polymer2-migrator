@@ -9,6 +9,8 @@ const isType = (...types)=>(e)=>types.includes(e.type);
 const parseSelector = (selector) => selector.match(/([\w-]+)/g).join('-');
 
 const removeRootCSS = (style) => style.replace(/:root/g,':host > *');
+const fixCssDefaultVal = (style) => style.replace(/var\((.*), *(--.*)\)/g,'var($1, var($2))');
+const fixCssApply = (style) => style.replace(/@apply\((.*?)\)/g,'@apply $1');
 
 const callback = (e)=> {
     switch (e.name) {
@@ -20,7 +22,7 @@ const callback = (e)=> {
             e.attribs = setSlot(e.attribs);
             break;
         case 'style':
-            e.children.forEach((styleNode)=>{styleNode.data=removeRootCSS(styleNode.data)});
+            e.children.forEach((styleNode)=>{styleNode.data=fixCssApply(fixCssDefaultVal(removeRootCSS(styleNode.data)))});
     }
 };
 
