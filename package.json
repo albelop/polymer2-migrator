@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/albelop/polymer2-migrator#readme",
   "dependencies": {
+    "css-tree": "^1.0.0-alpha24",
     "lodash": "^4.17.4",
     "parse5": "^3.0.2",
     "through2": "^2.0.3"

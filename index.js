@@ -1,5 +1,6 @@
 const parse5 = require('parse5');
 const lodash = require('lodash/fp');
+const csstree = require('css-tree');
 
 /* Function definitions */
 
@@ -9,10 +10,31 @@ const parseSelector = selector => selector.match(/([\w-]+)/g).join('-');
 const fixCssRoot = style => style.replace(/:root/g, ':host > *');
 const fixCssDefaultVal = style => style.replace(/var\((.*), *(--.*)\)/g, 'var($1, var($2))');
 const fixCssApply = style => style.replace(/@apply\((.*?)\)/g, '@apply $1');
+const fixCssShadow = style => {
+	let tree = csstree.parse(style)
+	let removableRules = [];
+	csstree.walk(tree, function(node, item, list) {
+		if ((node.type == "PseudoElementSelector" && node.name == "shadow") | (node.type == "Combinator" && node.name == "/deep/")) {
+			removableRules.push(this.rule);
+		}
+	});
+	let tree2 = csstree.toPlainObject(csstree.clone(tree));
+
+	// console.log(removableRules)
+	tree2.children = tree2.children.map((e)=>e==removableRules[0])
+	console.log(tree2.children)
+	// let parsed = csstree.parse(style);
+// console.log(JSON.stringify(tree,null,2));
+	// console.log(csstree.translate(tree));
+	// parsed.cssRules = parsed.cssRules.filter((e)=>!(e.selectorText.includes('/deep/')|e.selectorText.includes('::shadow')));
+	return csstree.translate(tree);
+
+
+};
 
 const fixCss = (styleNode) => {
 	let newStyleNode = lodash.cloneDeep(styleNode);
-	newStyleNode.data = lodash.compose(fixCssRoot, fixCssDefaultVal, fixCssApply)(newStyleNode.data);
+	newStyleNode.data = lodash.compose(fixCssRoot, fixCssDefaultVal, fixCssApply, fixCssShadow)(newStyleNode.data);
 	return newStyleNode;
 }
 
@@ -59,6 +81,7 @@ const traverseItem = (node) => {
 	newNode.children = !!newNode.children ? newNode.children.map(traverseItem) : null;
 	return newNode
 };
+
 
 module.exports = {
 	migrate: html => {
