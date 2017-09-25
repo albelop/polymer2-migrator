@@ -61,7 +61,7 @@ const traverseItem = (node) => {
 };
 
 module.exports = {
-	migrateFile: html => {
+	migrate: html => {
 		const tree = parse5.parseFragment(html, {
 			treeAdapter: parse5.treeAdapters.htmlparser2
 		});
