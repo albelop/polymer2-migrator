@@ -7,6 +7,13 @@ const csstree = require('css-tree');
 const isType = (...types) => e => types.includes(e.type);
 const parseSelector = selector => selector.match(/([\w-]+)/g).join('-');
 
+const html2tree = html => parse5.parseFragment(html, {
+    treeAdapter: parse5.treeAdapters.htmlparser2
+});
+const tree2html = tree => parse5.serialize(tree, {
+    treeAdapter: parse5.treeAdapters.htmlparser2
+});
+
 const fixCssRoot = style => style.replace(/:root/g, ':host > *');
 const fixCssDefaultVal = style => style.replace(/var\((.*), *(--.*)\)/g, 'var($1, var($2))');
 const fixCssApply = style => style.replace(/@apply\((.*?)\)/g, '@apply $1');
@@ -16,7 +23,7 @@ const isOldShadowStyle = styleNode => (styleNode.type === "PseudoElementSelector
 const fixCssShadow = style => {
     let tree = csstree.parse(style);
 
-    let children= tree.children.toArray().filter(
+    let children = tree.children.toArray().filter(
         rule => !rule.prelude.children.some(
             ruleSelector => (
                 ruleSelector.children.some(
@@ -25,15 +32,14 @@ const fixCssShadow = style => {
             )
         )
     );
-    tree.children =  tree.children.fromArray(children);
+    tree.children = tree.children.fromArray(children);
 
     return csstree.translate(tree);
-
 };
 
 const fixCss = (styleNode) => {
     let newStyleNode = lodash.cloneDeep(styleNode);
-    newStyleNode.data = lodash.compose(fixCssRoot, fixCssShadow, fixCssDefaultVal, fixCssApply)(newStyleNode.data);
+    newStyleNode.data = lodash.compose(fixCssShadow, fixCssRoot, fixCssDefaultVal, fixCssApply)(newStyleNode.data);
     return newStyleNode;
 };
 
@@ -82,13 +88,8 @@ const traverseItem = (node) => {
 };
 
 module.exports = {
-    migrate: html => {
-        const tree = parse5.parseFragment(html, {
-            treeAdapter: parse5.treeAdapters.htmlparser2
-        });
-        const modifiedTree = traverseItem(tree);
-        return parse5.serialize(modifiedTree, {
-            treeAdapter: parse5.treeAdapters.htmlparser2
-        });
-    }
+    migrate: html => lodash.compose(tree2html, traverseItem, html2tree)(html),
+    migrateHtml: html => {},
+    migrateCss: html => {},
+    migrateJs: html => {}
 }
