@@ -17,6 +17,7 @@ const tree2html = tree => parse5.serialize(tree, {
 const fixCssRoot = style => style.replace(/:root/g, ':host > *');
 const fixCssDefaultVal = style => style.replace(/var\((.*), *(--.*)\)/g, 'var($1, var($2))');
 const fixCssApply = style => style.replace(/@apply\((.*?)\)/g, '@apply $1');
+const fixCssSlotted = style => style.replace(/::content *>? *([\s\S]+?) *{/g, '::slotted($1) {');
 const isOldShadowStyle = styleNode => (styleNode.type === "PseudoElementSelector" && styleNode.name === "shadow") || (styleNode.type === "Combinator" && styleNode.name === "/deep/");
 
 
@@ -39,7 +40,7 @@ const fixCssShadow = style => {
 
 const fixCss = (styleNode) => {
     let newStyleNode = lodash.cloneDeep(styleNode);
-    newStyleNode.data = lodash.compose(fixCssShadow, fixCssRoot, fixCssDefaultVal, fixCssApply)(newStyleNode.data);
+    newStyleNode.data = lodash.compose(fixCssShadow, fixCssSlotted ,fixCssRoot, fixCssDefaultVal, fixCssApply)(newStyleNode.data);
     return newStyleNode;
 };
 
