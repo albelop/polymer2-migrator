@@ -14,6 +14,8 @@ const tree2html = tree => parse5.serialize(tree, {
     treeAdapter: parse5.treeAdapters.htmlparser2
 });
 
+const getParentTemplate = e => !!e.parent && ((e.parent.name === 'template')?e.parent:getParentTemplate(e.parent));
+
 const fixCssRoot = style => style.replace(/:root/g, ':host > *');
 const fixCssDefaultVal = style => style.replace(/var\((.*), *(--.*)\)/g, 'var($1, var($2))');
 const fixCssApply = style => style.replace(/@apply\((.*?)\)/g, '@apply $1');
@@ -55,6 +57,7 @@ const upgradeNode = (elem) => {
             newElement.attribs = setSlot(elem.attribs);
             break;
         case 'style':
+            if (!getParentTemplate(elem)){console.log('You need to define the style in the dom-mocule template')}
             newElement.children = elem.children.map(fixCss);
             break;
     }
