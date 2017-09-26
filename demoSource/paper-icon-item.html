@@ -59,6 +59,14 @@ Custom property               | Description                                    |
         @apply(--paper-icon-item);
       }
 
+      .content-icon /deep/ img{
+        display: block;
+      }
+
+      .content-icon ::shadow img{
+        display: block;
+      }
+
       .content-icon {
         @apply(--layout-horizontal);
         @apply(--layout-center);
