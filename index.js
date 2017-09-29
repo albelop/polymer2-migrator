@@ -1,6 +1,8 @@
 const parse5 = require('parse5');
 const lodash = require('lodash/fp');
 const csstree = require('css-tree');
+const acorn = require("acorn");
+const walk = require("acorn/dist/walk");
 
 /* Function definitions */
 
@@ -14,7 +16,7 @@ const tree2html = tree => parse5.serialize(tree, {
     treeAdapter: parse5.treeAdapters.htmlparser2
 });
 
-const getParentTemplate = e => !!e.parent && ((e.parent.name === 'template')?e.parent:getParentTemplate(e.parent));
+const getParentTemplate = e => !!e.parent && ((e.parent.name === 'template') ? e.parent : getParentTemplate(e.parent));
 
 const fixCssRoot = style => style.replace(/:root/g, ':host > *');
 const fixCssDefaultVal = style => style.replace(/var\((.*), *(--.*)\)/g, 'var($1, var($2))');
@@ -42,7 +44,7 @@ const fixCssShadow = style => {
 
 const fixCss = (styleNode) => {
     let newStyleNode = lodash.cloneDeep(styleNode);
-    newStyleNode.data = lodash.compose(fixCssShadow, fixCssSlotted ,fixCssRoot, fixCssDefaultVal, fixCssApply)(newStyleNode.data);
+    newStyleNode.data = lodash.compose(fixCssShadow, fixCssSlotted, fixCssRoot, fixCssDefaultVal, fixCssApply)(newStyleNode.data);
     return newStyleNode;
 };
 
@@ -57,8 +59,18 @@ const upgradeNode = (elem) => {
             newElement.attribs = setSlot(elem.attribs);
             break;
         case 'style':
-            if (!getParentTemplate(elem)){console.log('You need to define the style in the dom-mocule template')}
+            if (!getParentTemplate(elem)) {
+                console.log('You need to define the style in the dom-mocule template')
+            }
             newElement.children = elem.children.map(fixCss);
+            break;
+        case 'script':
+            let ast = acorn.parse(newElement.children[0].data);
+            walk.simple(ast, {
+                Property (node) {
+                    console.log(`Found a literal: ${node.type}/${node.key.name}/${node.value.value}`)
+                }
+            })
             break;
     }
     return newElement;
