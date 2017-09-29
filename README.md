@@ -13,7 +13,7 @@ Migrates a Polymer 1.x component to hybrid and/or Polymer 2.x component.
 
 ### Shadow DOM styles
 
-- :white_circle: Replace `::content` selectors with `::slotted()` selectors.
+- :white_check_mark: Replace `::content` selectors with `::slotted()` selectors.
 - :white_check_mark: Remove `/deep/` and `::shadow` selectors, if you're still using them.
 - :white_check_mark: Remove `:root` selectors.
 - :white_check_mark: Update custom property syntax.
