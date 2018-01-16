@@ -7,7 +7,7 @@ console.log('Reading file...')
 fs.readFile(inputFile, 'utf8', function(err, html) {
 	if (!err) {
 		console.log('Migrating component...')
-		const migratedHtml = migrator.migrateFile(html);
+		const migratedHtml = migrator.migrate(html);
 		fs.writeFile('./output/' + inputFile, migratedHtml, 'utf8', function(err) {
 			if (!err) {
 				console.log('File succesfully migrated.')
