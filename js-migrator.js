@@ -1,11 +1,12 @@
 const esprima = require('esprima');
-const escodegen = require('escodegen');
+const generateCode = require('escodegen').generate;
 
 const lisp2pascal = str => str.replace(/^([a-z])|\-([a-z0-9])/g, v => v.toUpperCase().replace('-', ''));;
 const getPropertyByKey = elem => key => elem.properties.find(prop => prop.key.name === key);
 const getMethods = elem => elem.properties.filter(e => e.value.type === 'FunctionExpression');
+const getExtends = behaviors => !!behaviors ? `Polymer.mixinBehaviors(${generateCode(behaviors.value)}, Polymer.Element)` : 'Polymer.Element';
+const method2code = method => `${method.key.name}(${method.value.params.map(e => generateCode(e)).join(',')})${generateCode(method.value.body)}`;
 
-const method2code = method => `${method.key.name}(${method.value.params.map(param => escodegen.generate(param)).join(',')})${escodegen.generate(method.value.body)}`;
 const listener2code = listener => {
   let isCompound = listener.key.value.split('.').length > 1;
   let target = isCompound ? `this.$.${listener.key.value.split('.')[0]}` : 'this';
@@ -19,40 +20,38 @@ module.exports = {
     if (parsedJS.body && parsedJS.body.length) {
       if (parsedJS.body[0].type == "ExpressionStatement" && parsedJS.body[0].expression.callee.name === 'Polymer') {
         const polymerData = parsedJS.body[0].expression.arguments[0];
-        let polymerComponent = {
+        let comp = {
           name: getPropertyByKey(polymerData)('is').value.value,
-          properties: getPropertyByKey(polymerData)('properties').value.properties,
+          className: lisp2pascal(getPropertyByKey(polymerData)('is').value.value),
+          properties: getPropertyByKey(polymerData)('properties'),
           behaviors: getPropertyByKey(polymerData)('behaviors'),
           observers: getPropertyByKey(polymerData)('observers'),
           listeners: getPropertyByKey(polymerData)('listeners'),
           methods: getMethods(polymerData)
         }
 
-        let extend = !!polymerComponent.behaviors ? `Polymer.mixinBehaviors(${escodegen.generate(polymerComponent.behaviors.value)}, Polymer.Element)` : 'Polymer.Element';
-        let code = `class ${lisp2pascal(polymerComponent.name)} extends ${extend}{`;
-        code += `static get is(){return '${polymerComponent.name}'}`;
+        return `class ${comp.className} extends ${getExtends(comp.behaviors)}{
+          static get is(){return '${comp.name}'}
 
-        code += 'static get properties(){return {';
-        let propertiesCode = polymerComponent.properties.map(e => escodegen.generate(e));
-        code += propertiesCode.join(',');
-        code += '}}';
+          static get properties(){
+            return ${generateCode(comp.properties.value)}
+          }
 
-        code += `static get observers(){return ${escodegen.generate(polymerComponent.observers.value)} }`;
+          static get observers(){
+            return ${generateCode(comp.observers.value)}
+          }
 
-        //Ready function. Add listeners
+          ready(){
+            ${comp.listeners.value.properties.map(listener2code).join('')}
+            super.ready();
+          }
 
-        code += 'ready(){';
-        code += polymerComponent.listeners.value.properties.map(listener2code).join('');
-        code += 'super.ready();}';
+          ${comp.methods.map(method2code).join('\n\n')}
 
+        }
 
-        let methodsCode = polymerComponent.methods.map(method2code);
-        code += methodsCode.join(' ');
+        window.customElements.define(${comp.className}.is, ${comp.className});`
 
-        code += '}'; //Close class 
-
-        code += `window.customElements.define(${lisp2pascal(polymerComponent.name)}.is, ${lisp2pascal(polymerComponent.name)});`
-        return (code);
       }
     }
   }
