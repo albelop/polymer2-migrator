@@ -102,7 +102,8 @@ Custom property               | Description                                    |
       },
       observers: ['greet(name)'],
       listeners: {
-        'tap': 'doSomething'
+        'tap': 'doSomething',
+        'contentIcon.click':'_myPrivateMethod'
       },
       behaviors: [
         Polymer.PaperItemBehavior

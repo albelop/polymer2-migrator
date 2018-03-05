@@ -1,12 +1,11 @@
 const esprima = require('esprima');
 const escodegen = require('escodegen');
 
-const lisp2camel = str => str.replace(/\-([a-z])/g, v => v.toUpperCase()[1])
+const lisp2pascal = str => str.replace(/^([a-z])|\-([a-z0-9])/g, v => v.toUpperCase().replace('-', ''));;
 const getPropertyByKey = elem => key => elem.properties.find(prop => prop.key.name === key);
 const getMethods = elem => elem.properties.filter(e => e.value.type === 'FunctionExpression');
 
 const method2code = method => `${method.key.name}(${method.value.params.map(param => escodegen.generate(param)).join(',')})${escodegen.generate(method.value.body)}`;
-// const listener2code = listener => `this.addEventListener('${listener.key.value}',this.${listener.value.value}.bind(this));`;
 const listener2code = listener => {
   let isCompound = listener.key.value.split('.').length > 1;
   let target = isCompound ? `this.$.${listener.key.value.split('.')[0]}` : 'this';
@@ -30,7 +29,7 @@ module.exports = {
         }
 
         let extend = !!polymerComponent.behaviors ? `Polymer.mixinBehaviors(${escodegen.generate(polymerComponent.behaviors.value)}, Polymer.Element)` : 'Polymer.Element';
-        let code = `class ${lisp2camel(polymerComponent.name)} extends ${extend}{`;
+        let code = `class ${lisp2pascal(polymerComponent.name)} extends ${extend}{`;
         code += `static get is(){return '${polymerComponent.name}'}`;
 
         code += 'static get properties(){return {';
@@ -52,7 +51,7 @@ module.exports = {
 
         code += '}'; //Close class 
 
-        code += `window.customElements.define(${lisp2camel(polymerComponent.name)}.is, ${lisp2camel(polymerComponent.name)});`
+        code += `window.customElements.define(${lisp2pascal(polymerComponent.name)}.is, ${lisp2pascal(polymerComponent.name)});`
         return (code);
       }
     }
