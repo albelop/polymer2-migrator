@@ -39,6 +39,8 @@ const upgradeNode = (elem) => {
       // let script = newElement.children[0].data;
       newElement.children[0].data = jsMigrator.migrate(newElement.children[0].data);
       break;
+    case 'link':
+      newElement.attribs.href = newElement.attribs.href.replace('polymer/polymer.html', 'polymer/polymer-element.html');
   }
   return newElement;
 };
