@@ -1,6 +1,5 @@
 const esprima = require('esprima');
 const escodegen = require('escodegen');
-const beautify = require('js-beautify').js_beautify;
 
 const lisp2camel = str => str.replace(/\-([a-z])/g, v => v.toUpperCase()[1])
 const getPropertyByKey = elem => key => elem.properties.find(prop => prop.key.name === key);
@@ -54,7 +53,7 @@ module.exports = {
         code += '}'; //Close class 
 
         code += `window.customElements.define(${lisp2camel(polymerComponent.name)}.is, ${lisp2camel(polymerComponent.name)});`
-        return (beautify(code));
+        return (code);
       }
     }
   }

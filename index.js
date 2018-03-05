@@ -2,6 +2,7 @@ const parse5 = require('parse5');
 const lodash = require('lodash/fp');
 const acorn = require('acorn');
 const walk = require('acorn/dist/walk');
+const pretty = require('pretty');
 const jsMigrator = require('./js-migrator.js');
 const cssMigrator = require('./css-migrator.js');
 
@@ -75,7 +76,7 @@ const traverseItem = (node) => {
 };
 
 module.exports = {
-  migrate: html => lodash.compose(tree2html, traverseItem, html2tree)(html),
+  migrate: html => lodash.compose(pretty, tree2html, traverseItem, html2tree)(html),
   migrateHtml: html => { },
   migrateCss: cssMigrator.migrate,
   migrateJs: jsMigrator.migrate
