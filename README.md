@@ -23,4 +23,8 @@ Migrates a Polymer 1.x component to hybrid and/or Polymer 2.x component.
 
 ### DOM APIs
 
+- :white_check_mark: Convert to class syntax.
+- :white_check_mark: Add listeners to ready function.
+- :white_check_mark: Behaviors as mixins
+
 Work in progress
