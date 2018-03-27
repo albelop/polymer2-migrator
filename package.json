@@ -36,7 +36,8 @@
     "parse5": "^3.0.2",
     "pretty": "^2.0.0",
     "through2": "^2.0.3",
-    "walk": "^2.3.13"
+    "walk": "^2.3.13",
+    "simple-git": "^1.92.0"
   },
   "devDependencies": {
     "gulp": "^3.9.1",

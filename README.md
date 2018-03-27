@@ -29,7 +29,6 @@ Migrates a Polymer 1.x component to hybrid and/or Polymer 2.x component.
 
 [Source](https://www.polymer-project.org/2.0/docs/upgrade#polymer-dom-apis)
 
-
 ### Common utility APIs
 - :white_circle: async
 - :white_circle: debounce
@@ -38,6 +37,8 @@ Migrates a Polymer 1.x component to hybrid and/or Polymer 2.x component.
 - :white_circle: $$
 [Source](https://www.polymer-project.org/2.0/docs/upgrade#common-utility-apis)
 
+### Additional Features
+- :white_check_mark: Git support: Giving a remote repository url, clones the repo in a local machine, creates a new branch, and migrates each html file to polymer2.
 
 
 Work in progress
