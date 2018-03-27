@@ -27,4 +27,17 @@ Migrates a Polymer 1.x component to hybrid and/or Polymer 2.x component.
 - :white_check_mark: Add listeners to ready function.
 - :white_check_mark: Behaviors as mixins
 
+[Source](https://www.polymer-project.org/2.0/docs/upgrade#polymer-dom-apis)
+
+
+### Common utility APIs
+- :white_circle: async
+- :white_circle: debounce
+- :white_circle: fire
+- :white_circle: importHref
+- :white_circle: $$
+[Source](https://www.polymer-project.org/2.0/docs/upgrade#common-utility-apis)
+
+
+
 Work in progress

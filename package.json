@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Migrate your Polymer 1.x components to hybrid and/or Polymer 2.x components",
   "main": "index.js",
+  "bin": {
+    "migrate-comopnent": "index.js"
+  },
   "scripts": {
     "test": "test"
   },
@@ -32,7 +35,8 @@
     "lodash": "^4.17.4",
     "parse5": "^3.0.2",
     "pretty": "^2.0.0",
-    "through2": "^2.0.3"
+    "through2": "^2.0.3",
+    "walk": "^2.3.13"
   },
   "devDependencies": {
     "gulp": "^3.9.1",
