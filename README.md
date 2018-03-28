@@ -29,7 +29,7 @@ The polymer2-migrator applies the following changes to upgrade your Polymer 1.x 
 - :white_check_mark: Remove `/deep/` and `::shadow` selectors, if you're still using them.
 - :white_check_mark: Remove `:root` selectors.
 - :white_check_mark: Update custom property syntax.
-- :white_circle: Wrap `custom-style` elements.
+- :white_check_mark: Wrap `custom-style` elements.
 
 [Source](https://www.polymer-project.org/2.0/docs/upgrade#shadow-dom-styles)
 
