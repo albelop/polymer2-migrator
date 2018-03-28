@@ -1,7 +1,19 @@
 # polymer2-migrator
 **:warning: Important: this project is still a WIP and highly experimental.**
 
-Migrates a Polymer 1.x component to hybrid and/or Polymer 2.x component.
+Migrates a Polymer 1.x component to Polymer 2.x component (class based).
+
+## Installation
+
+    npm install -g polymer2-migrator
+
+## Usage
+
+    migrate-component <component_root_folder>
+
+## How does it work?
+
+The polymer2-migrator applies the following changes to upgrade your Polymer 1.x component to Polymer 2.x class-based component:
 
 ### DOM template
 - :white_check_mark: Remove deprecated patterns in the DOM module: `<dom-module>` using `is` or `name`.
@@ -35,6 +47,7 @@ Migrates a Polymer 1.x component to hybrid and/or Polymer 2.x component.
 - :white_circle: fire
 - :white_circle: importHref
 - :white_circle: $$
+
 [Source](https://www.polymer-project.org/2.0/docs/upgrade#common-utility-apis)
 
 ### Additional Features

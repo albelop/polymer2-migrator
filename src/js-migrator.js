@@ -8,7 +8,7 @@ const getPropertyByKey = elem => key =>
 const getMethods = elem =>
   elem.properties.filter(e => e.value.type === "FunctionExpression");
 const getExtends = behaviors =>
-  !!behaviors
+  !!behaviors.value
     ? `Polymer.mixinBehaviors(${generateCode(
         behaviors.value
       )}, Polymer.Element)`
@@ -52,27 +52,35 @@ module.exports = {
           methods: getMethods(polymerData) || []
         };
 
-        return `class ${comp.className} extends ${getExtends(comp.behaviors)}{
-          static get is(){return '${comp.name}'}
+        let result;
+        result = `class ${comp.className} extends ${getExtends(comp.behaviors)}{
+          static get is(){return '${comp.name}'}`;
 
-          static get properties(){
+        if (!!comp.properties.value) {
+          result += `static get properties(){
             return ${generateCode(comp.properties.value)}
-          }
-
-          static get observers(){
-            return ${generateCode(comp.observers.value)}
-          }
-
-          ready(){
-            ${comp.listeners.value.properties.map(listener2code).join("")}
-            super.ready();
-          }
-
-          ${comp.methods.map(method2code).join("\n\n")}
-
+          }`;
         }
 
-        window.customElements.define(${comp.className}.is, ${comp.className});`;
+        if (!!comp.observers.value) {
+          result += `static get observers(){
+            return ${generateCode(comp.observers.value)}
+          }`;
+        }
+
+        if (!!comp.listeners.value) {
+          result += `ready(){
+                ${comp.listeners.value.properties.map(listener2code).join("")}
+                super.ready();
+            }`;
+        }
+
+        result += `${comp.methods.map(method2code).join("\n\n")}`;
+
+        result += `window.customElements.define(${comp.className}.is, ${
+          comp.className
+        });`;
+        return result;
       }
     }
   }

@@ -34,7 +34,8 @@ const upgradeNode = elem => {
       if (!getParentTemplate(elem)) {
         console.log("You need to define the style in the dom-module template");
       }
-      newElement.children = elem.children.map(cssMigrator.migrate);
+
+      newElement = cssMigrator.migrate(elem);
       break;
     case "script":
       // let script = newElement.children[0].data;
