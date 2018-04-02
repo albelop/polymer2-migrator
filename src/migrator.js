@@ -31,6 +31,7 @@ const upgradeNode = elem => {
     case "content":
       newElement.name = "slot";
       newElement.attribs = setSlot(elem.attribs);
+      logger.verbose(`Updated element's DOM template to use <slot> element instead of <content>.`);
       break;
     case "style":
       if (!getParentTemplate(elem)) {
@@ -71,6 +72,7 @@ const setDomModuleId = attrs => {
     newAttrs.id = attrs.is || newAttrs.name;
     delete newAttrs.is;
     delete newAttrs.name;
+    logger.verbose(`Removed decrecated patterns "is" and "name" in DOM module ()`);
   }
   return newAttrs;
 };
