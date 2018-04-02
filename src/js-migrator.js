@@ -1,4 +1,5 @@
 const esprima = require("esprima");
+const walk = require("esprima-walk");
 const lodash = require("lodash/fp");
 const logger = require("./logger.js");
 const generateCode = require("escodegen").generate;
@@ -42,57 +43,70 @@ const listener2code = listener => {
 module.exports = {
   migrate: function(html) {
     let parsedJS = esprima.parseScript(html);
-    if (parsedJS.body && parsedJS.body.length) {
+    walk(parsedJS, function(node) {
       if (
-        parsedJS.body[0].type == "ExpressionStatement" &&
-        parsedJS.body[0].expression.callee.name === "Polymer"
+        node.type == "ExpressionStatement" &&
+        node.expression &&
+        node.expression.callee &&
+        node.expression.callee.name === "Polymer"
       ) {
-        const polymerData = parsedJS.body[0].expression.arguments[0];
-        let comp = {
-          name: getPropertyByKey(polymerData)("is").value.value,
-          className: lisp2pascal(
-            getPropertyByKey(polymerData)("is").value.value
-          ),
-          properties: getPropertyByKey(polymerData)("properties") || {},
-          behaviors: getPropertyByKey(polymerData)("behaviors") || [],
-          observers: getPropertyByKey(polymerData)("observers") || [],
-          listeners: getPropertyByKey(polymerData)("listeners") || {},
-          methods: getMethods(polymerData).map(upgradeMethods) || []
-        };
-
-        let result;
-        result = `class ${comp.className} extends ${getExtends(comp.behaviors)}{
-          static get is(){return '${comp.name}'}`;
-
-        if (!!comp.properties.value) {
-          result += `static get properties(){
-            return ${generateCode(comp.properties.value)}
-          }`;
-        }
-
-        if (!!comp.observers.value) {
-          result += `static get observers(){
-            return ${generateCode(comp.observers.value)}
-          }`;
-        }
-
-        if (!!comp.listeners.value) {
-          result += `ready(){
-                ${comp.listeners.value.properties.map(listener2code).join("")}
-                super.ready();
-            }`;
-        }
-
-        result += `${comp.methods.map(method2code).join("\n\n")}`;
-
-        result += `} window.customElements.define(${comp.className}.is, ${
-          comp.className
-        });`;
-
-        logger.verbose(`- Converted component "${comp.name}" to class component "${comp.className}"`)
-        return result;
+        console.log(node);
+        debugger;
+        //TODO: run migrator. convert string to ast node. assign migrated node to current node
       }
-    }
+    });
+
+    // if (parsedJS.body && parsedJS.body.length) {
+    //   if (
+    //     parsedJS.body[0].type == "ExpressionStatement" &&
+    //     parsedJS.body[0].expression.callee.name === "Polymer"
+    //   ) {
+    //     const polymerData = parsedJS.body[0].expression.arguments[0];
+    //     let comp = {
+    //       name: getPropertyByKey(polymerData)("is").value.value,
+    //       className: lisp2pascal(
+    //         getPropertyByKey(polymerData)("is").value.value
+    //       ),
+    //       properties: getPropertyByKey(polymerData)("properties") || {},
+    //       behaviors: getPropertyByKey(polymerData)("behaviors") || [],
+    //       observers: getPropertyByKey(polymerData)("observers") || [],
+    //       listeners: getPropertyByKey(polymerData)("listeners") || {},
+    //       methods: getMethods(polymerData).map(upgradeMethods) || []
+    //     };
+
+    //     let result;
+    //     result = `class ${comp.className} extends ${getExtends(comp.behaviors)}{
+    //       static get is(){return '${comp.name}'}`;
+
+    //     if (!!comp.properties.value) {
+    //       result += `static get properties(){
+    //         return ${generateCode(comp.properties.value)}
+    //       }`;
+    //     }
+
+    //     if (!!comp.observers.value) {
+    //       result += `static get observers(){
+    //         return ${generateCode(comp.observers.value)}
+    //       }`;
+    //     }
+
+    //     if (!!comp.listeners.value) {
+    //       result += `ready(){
+    //             ${comp.listeners.value.properties.map(listener2code).join("")}
+    //             super.ready();
+    //         }`;
+    //     }
+
+    //     result += `${comp.methods.map(method2code).join("\n\n")}`;
+
+    //     result += `} window.customElements.define(${comp.className}.is, ${
+    //       comp.className
+    //     });`;
+
+    //     logger.verbose(`- Converted component "${comp.name}" to class component "${comp.className}"`)
+    //     return result;
+    //   }
+    // }
   }
 };
 //TODO:
