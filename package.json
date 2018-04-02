@@ -4,7 +4,7 @@
   "description": "Migrate your Polymer 1.x components to Polymer 2.x components",
   "main": "index.js",
   "bin": {
-    "migrate-comopnent": "index.js"
+    "migrate-component": "index.js"
   },
   "scripts": {
     "test": "test"
