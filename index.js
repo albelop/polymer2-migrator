@@ -32,7 +32,6 @@ walker.on("file", function(root, fileStats, next) {
     fs.readFile(filePath, "utf8", function(err, data) {
       var migratedComponent = migrator.migrate(data);
       logger.verbose(`Finished migrating file "${filePath}"`);
-      // TODO: check write flag
       if (!analyze) {
         fs.writeFile(filePath, migratedComponent, function(err) {
           if (err) {

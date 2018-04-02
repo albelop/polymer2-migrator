@@ -95,33 +95,39 @@ Custom property               | Description                                    |
   </template>
 
   <script>
-    Polymer({
-      is: 'paper-icon-item',
-      properties: {
-        name: String,
-        married: {
-          type: Boolean,
-          value: false
-        }
-      },
-      observers: ['greet(name)'],
-      listeners: {
-        'tap': 'doSomething',
-        'contentIcon.click': '_myPrivateMethod'
-      },
-      behaviors: [
-        Polymer.PaperItemBehavior
-      ],
-      _myPrivateMethod: function () {
-        this.married = !this.married;
-      },
-      doSomething: function () {
-        console.log('This function does something');
-      },
 
-      greet: function (name) {
-        console.log('Hello ' + name);
-      }
-    });
+    var MYVAR = window.MYVAR || {};
+
+    (function (window, myVar) {
+
+      Polymer({
+        is: 'paper-icon-item',
+        properties: {
+          name: String,
+          married: {
+            type: Boolean,
+            value: false
+          }
+        },
+        observers: ['greet(name)'],
+        listeners: {
+          'tap': 'doSomething',
+          'contentIcon.click': '_myPrivateMethod'
+        },
+        behaviors: [
+          Polymer.PaperItemBehavior
+        ],
+        _myPrivateMethod: function () {
+          this.married = !this.married;
+        },
+        doSomething: function () {
+          console.log('This function does something');
+        },
+
+        greet: function (name) {
+          console.log('Hello ' + name);
+        }
+      });
+    })(window, MYVAR)
   </script>
 </dom-module>

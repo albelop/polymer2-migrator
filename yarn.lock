@@ -130,6 +130,10 @@ escodegen@^1.9.0:
   optionalDependencies:
     source-map "~0.6.1"
 
+esprima-walk@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/esprima-walk/-/esprima-walk-0.1.0.tgz#953aab23d5b962822cf41dd82e58879334ba86fa"
+
 esprima@^3.1.3:
   version "3.1.3"
   resolved "https://registry.yarnpkg.com/esprima/-/esprima-3.1.3.tgz#fdca51cee6133895e3c88d535ce49dbff62a4633"
