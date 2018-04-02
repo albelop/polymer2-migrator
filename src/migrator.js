@@ -5,6 +5,7 @@ const walk = require("acorn/dist/walk");
 const pretty = require("pretty");
 const jsMigrator = require("./js-migrator.js");
 const cssMigrator = require("./css-migrator.js");
+const logger = require("./logger.js");
 
 /* Function definitions */
 
@@ -22,6 +23,7 @@ const getParentTemplate = e =>
 
 const upgradeNode = elem => {
   let newElement = lodash.cloneDeep(elem);
+
   switch (elem.name) {
     case "dom-module":
       newElement.attribs = setDomModuleId(elem.attribs);
@@ -32,9 +34,8 @@ const upgradeNode = elem => {
       break;
     case "style":
       if (!getParentTemplate(elem)) {
-        console.log("You need to define the style in the dom-module template");
+        logger.warning("You need to define the style in the dom-module template");
       }
-
       newElement = cssMigrator.migrate(elem);
       break;
     case "script":

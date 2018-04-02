@@ -4,6 +4,7 @@ const argv = require("yargs").argv;
 const fs = require("fs");
 var walk = require("walk");
 var path = require("path");
+const logger = require("./src/logger.js");
 const migrator = require("./src/migrator.js");
 
 var walker;
@@ -16,13 +17,18 @@ options = {
 
 let projectPath = argv._[0] || "./";
 
+logger.info(``);
+logger.info(`##########################`);
+logger.info(`Migrating component...`);
 walker = walk.walk(projectPath, options);
-
 walker.on("file", function(root, fileStats, next) {
   if (fileStats.name.endsWith(".html")) {
-	  let filePath = path.join(root, fileStats.name);
+    let filePath = path.join(root, fileStats.name);
+    logger.verbose(`-----------`);
+    logger.verbose(`Migrating file "${filePath}"`);
     fs.readFile(filePath, "utf8", function(err, data) {
-      console.log(migrator.migrate(data));
+      //TODO: write to File
+      migrator.migrate(data);
       next();
     });
   } else {
@@ -31,9 +37,10 @@ walker.on("file", function(root, fileStats, next) {
 });
 
 walker.on("errors", function(root, nodeStatsArray, next) {
+  logger.error('Error reading file.')
   next();
 });
 
 walker.on("end", function() {
-  console.log("all done");
+  logger.info("Component migration completed");
 });

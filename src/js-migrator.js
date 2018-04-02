@@ -1,7 +1,7 @@
 const esprima = require("esprima");
 const lodash = require("lodash/fp");
+const logger = require("./logger.js");
 const generateCode = require("escodegen").generate;
-
 
 const lisp2pascal = str =>
   str.replace(/^([a-z])|\-([a-z0-9])/g, v => v.toUpperCase().replace("-", ""));
@@ -21,7 +21,7 @@ const method2code = method =>
     .join(",")})${generateCode(method.value.body)}`;
 
 const upgradeMethods = elem => {
-  elem.key.name =  elem.key.name
+  elem.key.name = elem.key.name
     .replace(/^attached$/, "connectedCallback")
     .replace(/^detached$/, "disconnectedCallback");
   return elem;
@@ -88,6 +88,8 @@ module.exports = {
         result += `window.customElements.define(${comp.className}.is, ${
           comp.className
         });`;
+
+        logger.verbose(`Converted component "${comp.name}" to class component "${comp.className}"`)
         return result;
       }
     }
@@ -96,6 +98,6 @@ module.exports = {
 //TODO:
 // - Check existing lifecycle methods
 // - Replace this.fire API
-// -
+// - Import dom-if-, dom-bind, dom-repeat if used
 // -
 // -

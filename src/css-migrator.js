@@ -1,11 +1,36 @@
 const lodash = require("lodash/fp");
+const logger = require("./logger.js");
 
 const fixRoot = style => style.replace(/:root/g, ":host > *");
+
 const fixDefaultVal = style =>
   style.replace(/var\((.*), *(--.*)\)/g, "var($1, var($2))");
-const fixApply = style => style.replace(/@apply\((.*?)\)/g, "@apply $1");
-const fixSlotted = style =>
-  style.replace(/::content *>? *([\s\S]+?) *{/g, "::slotted($1) {");
+
+const fixApply = style => {
+  var regexp = new RegExp(/@apply\((.*?)\)/g);
+  var newStyle = style.replace(regexp, "@apply $1");
+  if (style !== newStyle) {
+    logger.verbose(
+      `Updated ${
+        style.match(regexp).length
+      } "@apply" rules.`
+    );
+  }
+  return newStyle;
+};
+
+const fixSlotted = style => {
+  var regexp = new RegExp(/::content *>? *([\s\S]+?) *{/g);
+  var newStyle = style.replace(regexp, "::slotted($1) {");
+  if (style !== newStyle) {
+    logger.verbose(
+      `Replaced ${
+        style.match(regexp).length
+      } "::content" selector with "::slotted"`
+    );
+  }
+  return newStyle;
+};
 const isOldShadowStyle = style =>
   style.includes("::shadow") || style.includes("/deep/");
 const splitRules = style => style.match(/.+?\{.+?\}/gim);
@@ -14,7 +39,14 @@ const trimNewLines = str => str.replace(/(\r\n|\n|\r)/gm, "");
 
 const fixShadow = style => {
   let rules = lodash.compose(splitRules, trimSpaces, trimNewLines)(style);
-  return !!rules ? rules.filter(e => !isOldShadowStyle(e)).join("\n") : "";
+  var filteredRules = rules.filter(e => !isOldShadowStyle(e));
+  var removedLinesCount = rules.length - filteredRules.length;
+  if (removedLinesCount > 0) {
+    logger.verbose(
+      `Removed ${removedLinesCount} CSS rules with deprecated selectors (::shadow and /deep/).`
+    );
+  }
+  return !!rules ? filteredRules.join("\n") : "";
 };
 
 const fixCustomStyleRoot = str => str.replace(/\:root/g, "html");

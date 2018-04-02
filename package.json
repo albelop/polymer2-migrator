@@ -37,7 +37,8 @@
     "pretty": "^2.0.0",
     "simple-git": "^1.92.0",
     "through2": "^2.0.3",
-    "walk": "^2.3.13"
+    "walk": "^2.3.13",
+    "winston": "^2.4.1"
   },
   "devDependencies": {
     "yargs": "^9.0.1"
