@@ -26,8 +26,16 @@ walker.on("file", function(root, fileStats, next) {
     logger.verbose(`-----------`);
     logger.verbose(`Migrating file "${filePath}"`);
     fs.readFile(filePath, "utf8", function(err, data) {
-      //TODO: write to File (if flag)
-      migrator.migrate(data);
+      var migratedComponent = migrator.migrate(data);
+      var newFileName = filePath.replace(".html", "_2.html");
+      // TODO: check write flag
+      fs.writeFile(newFileName, migratedComponent, function(err) {
+        if (err) {
+          logger.error(err);
+        }
+        logger.info(`New component saved: ${newFileName}`);
+      });
+
       next();
     });
   } else {
@@ -36,7 +44,7 @@ walker.on("file", function(root, fileStats, next) {
 });
 
 walker.on("errors", function(root, nodeStatsArray, next) {
-  logger.error('Error reading file.')
+  logger.error("Error reading file.");
   next();
 });
 
