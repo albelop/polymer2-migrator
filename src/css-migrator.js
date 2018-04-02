@@ -52,18 +52,24 @@ const fixCustomStyleTag = node => {
   delete node.attribs.is;
 };
 
+const wrapCustomStyle = node => {
+  let newCustomStyleNode = lodash.cloneDeep(node);
+  newCustomStyleNode.children = newCustomStyleNode.children.map(child => {
+    child.data = fixCustomStyleRoot(child.data);
+    return child;
+  });
+  delete newCustomStyleNode.attribs.is;
+  node.children = [newCustomStyleNode];
+  node.tagName = "custom-style";
+  delete node.attribs.is;
+  logger.verbose('Wrapped custom style with "<custom-style>" tag.');
+  return node;
+};
+
 module.exports = {
   migrate: styleNode => {
     let newStyleNode = lodash.cloneDeep(styleNode);
 
-    if (newStyleNode.attribs.is && newStyleNode.attribs.is === "custom-style") {
-      logger.verbose('Defined "custom-style" as wrapper.');
-      newStyleNode.children = newStyleNode.children.map(child => {
-        child.data = fixCustomStyleRoot(child.data);
-        return child;
-      });
-      fixCustomStyleTag(newStyleNode);
-    }
     newStyleNode.children = newStyleNode.children.map(child => {
       child.data = lodash.compose(
         fixShadow,
@@ -74,6 +80,10 @@ module.exports = {
       )(child.data);
       return child;
     });
+
+    if (newStyleNode.attribs.is && newStyleNode.attribs.is === "custom-style") {
+      newStyleNode = wrapCustomStyle(newStyleNode);
+    }
 
     return newStyleNode;
   }

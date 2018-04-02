@@ -85,7 +85,7 @@ module.exports = {
 
         result += `${comp.methods.map(method2code).join("\n\n")}`;
 
-        result += `window.customElements.define(${comp.className}.is, ${
+        result += `} window.customElements.define(${comp.className}.is, ${
           comp.className
         });`;
 
