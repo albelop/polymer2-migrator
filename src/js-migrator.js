@@ -1,5 +1,7 @@
 const esprima = require("esprima");
+const lodash = require("lodash/fp");
 const generateCode = require("escodegen").generate;
+
 
 const lisp2pascal = str =>
   str.replace(/^([a-z])|\-([a-z0-9])/g, v => v.toUpperCase().replace("-", ""));
@@ -18,6 +20,12 @@ const method2code = method =>
     .map(e => generateCode(e))
     .join(",")})${generateCode(method.value.body)}`;
 
+const upgradeMethods = elem => {
+  elem.key.name =  elem.key.name
+    .replace(/^attached$/, "connectedCallback")
+    .replace(/^detached$/, "disconnectedCallback");
+  return elem;
+};
 const listener2code = listener => {
   let isCompound = listener.key.value.split(".").length > 1;
   let target = isCompound
@@ -49,7 +57,7 @@ module.exports = {
           behaviors: getPropertyByKey(polymerData)("behaviors") || [],
           observers: getPropertyByKey(polymerData)("observers") || [],
           listeners: getPropertyByKey(polymerData)("listeners") || {},
-          methods: getMethods(polymerData) || []
+          methods: getMethods(polymerData).map(upgradeMethods) || []
         };
 
         let result;

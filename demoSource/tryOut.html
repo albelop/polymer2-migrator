@@ -17,7 +17,11 @@
 	</template>
 	<script>
 		Polymer({
-			is: "paco"
+			is: "paco",
+
+			attached: function () {
+				console.log('attached');
+			}
 		});
 	</script>
 </dom-module>
