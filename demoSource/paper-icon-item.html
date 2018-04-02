@@ -50,6 +50,10 @@ Custom property               | Description                                    |
   <template>
     <style include="paper-item-shared-styles"></style>
     <style>
+      :root {
+        color: red;
+      }
+
       :host {
         @apply(--layout-horizontal);
         @apply(--layout-center);
@@ -59,19 +63,19 @@ Custom property               | Description                                    |
         @apply(--paper-icon-item);
       }
 
-      .content-icon /deep/ img{
+      .content-icon /deep/ img {
         display: block;
       }
 
-      .content-icon ::shadow img{
+      .content-icon ::shadow img {
         display: block;
       }
 
-      ::content > span{
+      ::content>span {
         background: green;
       }
 
-      ::content h1{
+      ::content h1 {
         background: green;
       }
 
@@ -103,19 +107,19 @@ Custom property               | Description                                    |
       observers: ['greet(name)'],
       listeners: {
         'tap': 'doSomething',
-        'contentIcon.click':'_myPrivateMethod'
+        'contentIcon.click': '_myPrivateMethod'
       },
       behaviors: [
         Polymer.PaperItemBehavior
       ],
-      _myPrivateMethod: function() {
+      _myPrivateMethod: function () {
         this.married = !this.married;
       },
-      doSomething: function() {
+      doSomething: function () {
         console.log('This function does something');
       },
 
-      greet: function(name) {
+      greet: function (name) {
         console.log('Hello ' + name);
       }
     });

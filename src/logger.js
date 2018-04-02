@@ -8,7 +8,7 @@ var logger = new winston.Logger({
       timestamp:()=>(new Date().toLocaleTimeString()),
       json: false,
       showLevel: false,
-      filename: "somefile.log"
+      filename: "migrator-analysis.log"
     })
   ]
 });

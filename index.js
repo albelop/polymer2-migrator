@@ -9,9 +9,8 @@ const migrator = require("./src/migrator.js");
 
 var walker;
 
-options = {
+var walkerOptions = {
   followLinks: false,
-  // directories with these keys will be skipped
   filters: [".git", "node_modules", "bower_components", "build"]
 };
 
@@ -20,14 +19,14 @@ let projectPath = argv._[0] || "./";
 logger.info(``);
 logger.info(`##########################`);
 logger.info(`Migrating component...`);
-walker = walk.walk(projectPath, options);
+walker = walk.walk(projectPath, walkerOptions);
 walker.on("file", function(root, fileStats, next) {
   if (fileStats.name.endsWith(".html")) {
     let filePath = path.join(root, fileStats.name);
     logger.verbose(`-----------`);
     logger.verbose(`Migrating file "${filePath}"`);
     fs.readFile(filePath, "utf8", function(err, data) {
-      //TODO: write to File
+      //TODO: write to File (if flag)
       migrator.migrate(data);
       next();
     });
