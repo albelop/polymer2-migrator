@@ -1,49 +1,33 @@
 const lodash = require("lodash/fp");
 const logger = require("./logger.js");
 
-const fixRoot = style => {
-  var regexp = new RegExp(/:root/g);
-  var newStyle = style.replace(regexp, ":host > *");
-  if (style !== newStyle) {
-    logger.verbose(`Replaced ":root" with ":host > *".`);
+const fixCss = (style, regexp, str, msg) => {
+  var newStyle = style.replace(new RegExp(regexp), str);
+  if (newStyle !== style) {
+    logger.verbose(msg);
   }
   return newStyle;
 };
 
-const fixDefaultVal = style => {
-  var regexp = new RegExp(/var\((.*), *(--.*)\)/g);
-  var newStyle = style.replace(regexp, "var($1, var($2))");
-  if (style !== newStyle) {
-    logger.verbose(
-      `Fixed ${
-        style.match(regexp).length
-      } wrong default values in CSS variables.`
-    );
-  }
-  return newStyle;
-};
+const fixRoot = style =>
+  fixCss(style, /:root/g, ":host > *", 'Replaced ":root" with ":host > *".');
+const fixDefaultVal = style =>
+  fixCss(
+    style,
+    /var\((.*), *(--.*)\)/g,
+    "var($1, var($2))",
+    "Fixed wrong default values in CSS variables."
+  );
 
-const fixApply = style => {
-  var regexp = new RegExp(/@apply\((.*?)\)/g);
-  var newStyle = style.replace(regexp, "@apply $1");
-  if (style !== newStyle) {
-    logger.verbose(`Updated ${style.match(regexp).length} "@apply" rules.`);
-  }
-  return newStyle;
-};
-
-const fixSlotted = style => {
-  var regexp = new RegExp(/::content *>? *([\s\S]+?) *{/g);
-  var newStyle = style.replace(regexp, "::slotted($1) {");
-  if (style !== newStyle) {
-    logger.verbose(
-      `Replaced ${
-        style.match(regexp).length
-      } "::content" selector with "::slotted".`
-    );
-  }
-  return newStyle;
-};
+const fixApply = style =>
+  fixCss(style, /@apply\((.*?)\)/g, "@apply $1", 'Updated "@apply" rules.');
+const fixSlotted = style =>
+  fixCss(
+    style,
+    /::content *>? *([\s\S]+?) *{/g,
+    "::slotted($1) {",
+    'Replaced "::content" selector with "::slotted".'
+  );
 
 const isOldShadowStyle = style =>
   style.includes("::shadow") || style.includes("/deep/");
@@ -57,7 +41,7 @@ const fixShadow = style => {
   var removedLinesCount = rules.length - filteredRules.length;
   if (removedLinesCount > 0) {
     logger.verbose(
-      `Removed ${removedLinesCount} CSS rules with deprecated selectors "::shadow" or "/deep/").`
+      'Removed CSS rules with deprecated selectors "::shadow" or "/deep/").'
     );
   }
   return !!rules ? filteredRules.join("\n") : "";
