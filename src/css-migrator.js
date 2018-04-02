@@ -38,13 +38,12 @@ const trimNewLines = str => str.replace(/(\r\n|\n|\r)/gm, "");
 const fixShadow = style => {
   let rules = lodash.compose(splitRules, trimSpaces, trimNewLines)(style);
   var filteredRules = rules.filter(e => !isOldShadowStyle(e));
-  var removedLinesCount = rules.length - filteredRules.length;
-  if (removedLinesCount > 0) {
+  if (rules.length !== filteredRules.length) {
     logger.verbose(
       'Removed CSS rules with deprecated selectors "::shadow" or "/deep/").'
     );
   }
-  return !!rules ? filteredRules.join("\n") : "";
+  return !!filteredRules ? filteredRules.join("\n") : "";
 };
 
 const fixCustomStyleRoot = str => str.replace(/\:root/g, "html");
