@@ -1,14 +1,17 @@
 const winston = require("winston");
 
 var logger = new winston.Logger({
-  level: "verbose",
   transports: [
-    new winston.transports.Console(),
+    new winston.transports.Console({
+      level: "info",
+      showLevel: false,
+    }),
     new winston.transports.File({
-      timestamp:()=>(new Date().toLocaleTimeString()),
+      timestamp: () => new Date().toLocaleTimeString(),
+      level: "verbose",
       json: false,
       showLevel: false,
-      filename: "migrator-analysis.log"
+      filename: `./migrator-analysis_${Date.now()}.log`
     })
   ]
 });

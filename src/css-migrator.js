@@ -4,7 +4,7 @@ const logger = require("./logger.js");
 const fixCss = (style, regexp, str, msg) => {
   var newStyle = style.replace(new RegExp(regexp), str);
   if (newStyle !== style) {
-    logger.verbose(msg);
+    logger.verbose(`- ${msg}`);
   }
   return newStyle;
 };
@@ -40,7 +40,7 @@ const fixShadow = style => {
   var filteredRules = rules.filter(e => !isOldShadowStyle(e));
   if (rules.length !== filteredRules.length) {
     logger.verbose(
-      'Removed CSS rules with deprecated selectors "::shadow" or "/deep/").'
+      '- Removed CSS rules with deprecated selectors "::shadow" or "/deep/").'
     );
   }
   return !!filteredRules ? filteredRules.join("\n") : "";
@@ -62,7 +62,7 @@ const wrapCustomStyle = node => {
   node.children = [newCustomStyleNode];
   node.tagName = "custom-style";
   delete node.attribs.is;
-  logger.verbose('Wrapped custom style with "<custom-style>" tag.');
+  logger.verbose('- Wrapped custom style with "<custom-style>" tag.');
   return node;
 };
 

@@ -9,7 +9,21 @@ Migrates a Polymer 1.x component to Polymer 2.x component (class based).
 
 ## Usage
 
+To migrate the component in a folder, run the following command in the root folder of the component:
+
+    migrate-component
+
+You can also target a specific folder to migrate.
+
     migrate-component <component_root_folder>
+
+If the `--analyze` flag is used, the migrator will only analyze the component to check which migrations are possible, and generate a `migrator-analysis` file. It will not make any changes in the component's files.
+
+    migrate-component --analyze
+
+Flag `--logLevel` is available to define the log level of the console output:
+
+    migrate-component --logLevel=verbose
 
 ## How does it work?
 
@@ -51,7 +65,6 @@ The polymer2-migrator applies the following changes to upgrade your Polymer 1.x 
 [Source](https://www.polymer-project.org/2.0/docs/upgrade#common-utility-apis)
 
 ### Additional Features
-- :white_check_mark: Git support: Giving a remote repository url, clones the repo in a local machine, creates a new branch, and migrates each html file to polymer2.
+- Analysis file: Generates a verbose log file showing all the applied changes to each file.
+- ...
 
-
-Work in progress

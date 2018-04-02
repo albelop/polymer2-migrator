@@ -89,7 +89,7 @@ module.exports = {
           comp.className
         });`;
 
-        logger.verbose(`Converted component "${comp.name}" to class component "${comp.className}"`)
+        logger.verbose(`- Converted component "${comp.name}" to class component "${comp.className}"`)
         return result;
       }
     }

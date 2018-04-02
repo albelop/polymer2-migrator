@@ -14,10 +14,14 @@ var walkerOptions = {
   filters: [".git", "node_modules", "bower_components", "build"]
 };
 
-let projectPath = argv._[0] || "./";
 
-logger.info(``);
-logger.info(`##########################`);
+
+let projectPath = argv._[0] || "./";
+let analyze = argv.analyze || false;
+let logLevel = argv.logLevel || 'info';
+
+logger.transports.console.level = logLevel;
+
 logger.info(`Migrating component...`);
 walker = walk.walk(projectPath, walkerOptions);
 walker.on("file", function(root, fileStats, next) {
@@ -27,15 +31,15 @@ walker.on("file", function(root, fileStats, next) {
     logger.verbose(`Migrating file "${filePath}"`);
     fs.readFile(filePath, "utf8", function(err, data) {
       var migratedComponent = migrator.migrate(data);
-      var newFileName = filePath.replace(".html", "_2.html");
+      logger.verbose(`Finished migrating file "${filePath}"`);
       // TODO: check write flag
-      fs.writeFile(newFileName, migratedComponent, function(err) {
-        if (err) {
-          logger.error(err);
-        }
-        logger.info(`New component saved: ${newFileName}`);
-      });
-
+      if (!analyze) {
+        fs.writeFile(filePath, migratedComponent, function(err) {
+          if (err) {
+            logger.error(err);
+          }
+        });
+      }
       next();
     });
   } else {
@@ -49,5 +53,6 @@ walker.on("errors", function(root, nodeStatsArray, next) {
 });
 
 walker.on("end", function() {
+  logger.verbose(`-----------`);
   logger.info("Component migration completed");
 });
