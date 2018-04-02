@@ -1,20 +1,33 @@
 const lodash = require("lodash/fp");
 const logger = require("./logger.js");
 
-const fixRoot = style => style.replace(/:root/g, ":host > *");
+const fixRoot = style => {
+  var regexp = new RegExp(/:root/g);
+  var newStyle = style.replace(regexp, ":host > *");
+  if (style !== newStyle) {
+    logger.verbose(`Replaced ":root" with ":host > *".`);
+  }
+  return newStyle;
+};
 
-const fixDefaultVal = style =>
-  style.replace(/var\((.*), *(--.*)\)/g, "var($1, var($2))");
+const fixDefaultVal = style => {
+  var regexp = new RegExp(/var\((.*), *(--.*)\)/g);
+  var newStyle = style.replace(regexp, "var($1, var($2))");
+  if (style !== newStyle) {
+    logger.verbose(
+      `Fixed ${
+        style.match(regexp).length
+      } wrong default values in CSS variables.`
+    );
+  }
+  return newStyle;
+};
 
 const fixApply = style => {
   var regexp = new RegExp(/@apply\((.*?)\)/g);
   var newStyle = style.replace(regexp, "@apply $1");
   if (style !== newStyle) {
-    logger.verbose(
-      `Updated ${
-        style.match(regexp).length
-      } "@apply" rules.`
-    );
+    logger.verbose(`Updated ${style.match(regexp).length} "@apply" rules.`);
   }
   return newStyle;
 };
@@ -26,11 +39,12 @@ const fixSlotted = style => {
     logger.verbose(
       `Replaced ${
         style.match(regexp).length
-      } "::content" selector with "::slotted"`
+      } "::content" selector with "::slotted".`
     );
   }
   return newStyle;
 };
+
 const isOldShadowStyle = style =>
   style.includes("::shadow") || style.includes("/deep/");
 const splitRules = style => style.match(/.+?\{.+?\}/gim);
@@ -43,7 +57,7 @@ const fixShadow = style => {
   var removedLinesCount = rules.length - filteredRules.length;
   if (removedLinesCount > 0) {
     logger.verbose(
-      `Removed ${removedLinesCount} CSS rules with deprecated selectors (::shadow and /deep/).`
+      `Removed ${removedLinesCount} CSS rules with deprecated selectors "::shadow" or "/deep/").`
     );
   }
   return !!rules ? filteredRules.join("\n") : "";
@@ -60,6 +74,7 @@ module.exports = {
     let newStyleNode = lodash.cloneDeep(styleNode);
 
     if (newStyleNode.attribs.is && newStyleNode.attribs.is === "custom-style") {
+      logger.verbose('Defined "custom-style" as wrapper.');
       newStyleNode.children = newStyleNode.children.map(child => {
         child.data = fixCustomStyleRoot(child.data);
         return child;
