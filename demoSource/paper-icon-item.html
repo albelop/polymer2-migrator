@@ -94,7 +94,6 @@ Custom property               | Description                                    |
           background: yellow;
         }
       }
-
     </style>
 
     <div id="contentIcon" class="content-icon">
@@ -126,6 +125,10 @@ Custom property               | Description                                    |
         behaviors: [
           Polymer.PaperItemBehavior
         ],
+
+        ready: function () {
+          console.log('Ready')
+        },
         _myPrivateMethod: function () {
           this.married = !this.married;
         },
