@@ -12,8 +12,15 @@ const logger = require("./logger.js");
 const isType = (...types) => e => types.includes(e.type);
 const parseSelector = selector => selector.match(/([\w-]+)/g).join("-");
 
-const html2tree = html =>
-  parse5.parseFragment(html, { treeAdapter: parse5.treeAdapters.htmlparser2 });
+const html2tree = html => {
+  let parser;
+  if (html.includes("<html")) {
+    parser = parse5.parse;
+  } else {
+    parser = parse5.parseFragment;
+  }
+  return parser(html, { treeAdapter: parse5.treeAdapters.htmlparser2 });
+};
 const tree2html = tree =>
   parse5.serialize(tree, { treeAdapter: parse5.treeAdapters.htmlparser2 });
 
@@ -23,7 +30,6 @@ const getParentTemplate = e =>
 
 const upgradeNode = elem => {
   let newElement = lodash.cloneDeep(elem);
-
   switch (elem.name) {
     case "dom-module":
       newElement.attribs = setDomModuleId(elem.attribs);
@@ -37,9 +43,7 @@ const upgradeNode = elem => {
       break;
     case "style":
       if (!getParentTemplate(elem)) {
-        logger.warn(
-          "You need to define the style in the dom-module template"
-        );
+        logger.warn("You need to define the style in the dom-module template");
       }
       newElement = cssMigrator.migrate(elem);
       break;
