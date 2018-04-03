@@ -1,68 +1,57 @@
-const argv = require('yargs').argv;
-const parse5 = require('parse5');
-const fs = require('fs');
+#!/usr/bin/env node
 
-const inputFile = argv.file;
+const argv = require("yargs").argv;
+const fs = require("fs");
+var walk = require("walk");
+var path = require("path");
+const logger = require("./src/logger.js");
+const migrator = require("./src/migrator.js");
 
-const isType = (...types)=>(e)=>types.includes(e.type);
+var walker;
 
-const parseSelector = (selector) => selector.match(/([\w-]+)/g).join('-');
-
-const removeRootCSS = (style) => style.replace(/ *:root([\s\S]*?)}/gm,'');
-
-const callback = (e)=> {
-    switch (e.name) {
-        case 'dom-module':
-            e.attribs = setDomModuleId(e.attribs);
-            break;
-        case 'content':
-            e.name = 'slot';
-            e.attribs = setSlot(e.attribs);
-            break;
-        case 'style':
-            e.children.forEach((styleNode)=>{styleNode.data=removeRootCSS(styleNode.data)});
-    }
+var walkerOptions = {
+  followLinks: false,
+  filters: [".git", "node_modules", "bower_components", "build"]
 };
 
-const setSlot = (attrs) => {
-    let newAttrs = Object.assign(attrs);
-    if ('select' in attrs) {
-        newAttrs.name = parseSelector(attrs.select);
-        delete (newAttrs.select);
-    }
-    return newAttrs;
 
-};
 
-const setDomModuleId = (attrs)=> {
-    let newAttrs = Object.assign(attrs);
-    if ('is' in attrs || 'name' in attrs) {
-        newAttrs.id = attrs.is || attrs.name;
-        delete (newAttrs.is);
-        delete (newAttrs.name);
-    }
-    return newAttrs;
-};
+let projectPath = argv._[0] || "./";
+let analyze = argv.analyze || false;
+let logLevel = argv.logLevel || 'info';
 
-const traverseItem = (node)=> {
-    callback(node);
+logger.transports.console.level = logLevel;
 
-    if (!!node.children) {
-        node.children
-            .forEach(traverseItem);
-    }
-};
+logger.info(`Migrating component...`);
+walker = walk.walk(projectPath, walkerOptions);
+walker.on("file", function(root, fileStats, next) {
+  if (fileStats.name.endsWith(".html")) {
+    let filePath = path.join(root, fileStats.name);
+    logger.verbose(`-----------`);
+    logger.verbose(`Migrating file "${filePath}"`);
+    fs.readFile(filePath, "utf8", function(err, data) {
+      var migratedComponent = migrator.migrate(data);
+      logger.verbose(`Finished migrating file "${filePath}"`);
+      if (!analyze) {
+        fs.writeFile(filePath, migratedComponent, function(err) {
+          if (err) {
+            logger.error(err);
+          }
+        });
+      }
+      next();
+    });
+  } else {
+    next();
+  }
+});
 
-const file = fs.createWriteStream('./build/' + inputFile);
+walker.on("errors", function(root, nodeStatsArray, next) {
+  logger.error("Error reading file.");
+  next();
+});
 
-const src = fs.readFile(inputFile, 'utf8', function (err, html) {
-    if (err) {
-        // handle error
-    } else {
-        const tree = parse5.parseFragment(html, {treeAdapter: parse5.treeAdapters.htmlparser2});
-        traverseItem(tree);
-        const serializer = new parse5.SerializerStream(tree, {treeAdapter: parse5.treeAdapters.htmlparser2});
-
-        serializer.pipe(file);
-    }
+walker.on("end", function() {
+  logger.verbose(`-----------`);
+  logger.info("Component migration completed");
 });

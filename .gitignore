@@ -57,3 +57,12 @@ typings/
 # dotenv environment variables file
 .env
 
+# IntelliJ editor conf
+.idea
+
+# Visual Studio Code editor conf
+.vscode
+
+# Output folder
+output
+
