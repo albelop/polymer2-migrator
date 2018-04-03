@@ -79,13 +79,22 @@ Custom property               | Description                                    |
         background: green;
       }
 
-      .content-icon {
-        @apply(--layout-horizontal);
-        @apply(--layout-center);
+      @media screen and (max-width: 360px) {
+        .content-icon {
+          @apply(--layout-horizontal);
+          @apply(--layout-center);
 
-        width: var(--paper-item-icon-width, --paper-item-icon-default-width);
-        @apply(--paper-item-icon);
+          width: var(--paper-item-icon-width, --paper-item-icon-default-width);
+          @apply(--paper-item-icon);
+        }
+        .content-icon /deep/ img {
+          display: inline-block;
+        }
+        ::content h1 {
+          background: yellow;
+        }
       }
+
     </style>
 
     <div id="contentIcon" class="content-icon">

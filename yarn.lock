@@ -85,6 +85,13 @@ cross-spawn@^5.0.1:
     shebang-command "^1.2.0"
     which "^1.2.9"
 
+css-tree@^1.0.0-alpha.28:
+  version "1.0.0-alpha.28"
+  resolved "https://registry.yarnpkg.com/css-tree/-/css-tree-1.0.0-alpha.28.tgz#8e8968190d886c9477bc8d61e96f61af3f7ffa7f"
+  dependencies:
+    mdn-data "~1.1.0"
+    source-map "^0.5.3"
+
 cycle@1.0.x:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/cycle/-/cycle-1.0.3.tgz#21e80b2be8580f98b468f379430662b046c34ad2"
@@ -323,6 +330,10 @@ lru-cache@^4.0.1:
     pseudomap "^1.0.2"
     yallist "^2.1.2"
 
+mdn-data@~1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/mdn-data/-/mdn-data-1.1.0.tgz#a7056319da95a2d0881267d7263075042eb061e2"
+
 mem@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/mem/-/mem-1.1.0.tgz#5edd52b485ca1d900fe64895505399a0dfa45f76"
@@ -535,6 +546,10 @@ simple-git@^1.92.0:
   resolved "https://registry.yarnpkg.com/simple-git/-/simple-git-1.92.0.tgz#6061468eb7d19f0141078fc742e62457e910f547"
   dependencies:
     debug "^3.1.0"
+
+source-map@^0.5.3:
+  version "0.5.7"
+  resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.5.7.tgz#8a039d2d1021d22d1ea14c80d8ea468ba2ef3fcc"
 
 source-map@~0.6.1:
   version "0.6.1"
