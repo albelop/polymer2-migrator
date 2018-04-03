@@ -31,20 +31,24 @@ const upgradeNode = elem => {
     case "content":
       newElement.name = "slot";
       newElement.attribs = setSlot(elem.attribs);
-      logger.verbose(`- Updated element's DOM template to use <slot> element instead of <content>.`);
+      logger.verbose(
+        '- Updated element\'s DOM template to use "<slot>" element instead of "<content>".'
+      );
       break;
     case "style":
       if (!getParentTemplate(elem)) {
-        logger.warning("You need to define the style in the dom-module template");
+        logger.warning(
+          "You need to define the style in the dom-module template"
+        );
       }
       newElement = cssMigrator.migrate(elem);
       break;
     case "script":
       // let script = newElement.children[0].data;
       //TODO: check if Polymer object
-      if (newElement.children[0].data) {
-        newElement.children[0].data = jsMigrator.migrate(
-          newElement.children[0].data
+      if (newElement.firstChild.data) {
+        newElement.firstChild.data = jsMigrator.migrate(
+          newElement.firstChild.data
         );
       }
       break;
@@ -72,7 +76,9 @@ const setDomModuleId = attrs => {
     newAttrs.id = attrs.is || newAttrs.name;
     delete newAttrs.is;
     delete newAttrs.name;
-    logger.verbose(`- Removed decrecated patterns "is" and "name" in DOM module ()`);
+    logger.verbose(
+      `- Removed decrecated patterns "is" and "name" in DOM module ()`
+    );
   }
   return newAttrs;
 };
