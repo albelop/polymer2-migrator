@@ -46,7 +46,7 @@ const upgradeNode = elem => {
     case "script":
       // let script = newElement.children[0].data;
       //TODO: check if Polymer object
-      if (newElement.firstChild.data) {
+      if (newElement.firstChild && newElement.firstChild.data) {
         newElement.firstChild.data = jsMigrator.migrate(
           newElement.firstChild.data
         );
