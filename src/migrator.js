@@ -37,15 +37,13 @@ const upgradeNode = elem => {
       break;
     case "style":
       if (!getParentTemplate(elem)) {
-        logger.warning(
+        logger.warn(
           "You need to define the style in the dom-module template"
         );
       }
       newElement = cssMigrator.migrate(elem);
       break;
     case "script":
-      // let script = newElement.children[0].data;
-      //TODO: check if Polymer object
       if (newElement.firstChild && newElement.firstChild.data) {
         newElement.firstChild.data = jsMigrator.migrate(
           newElement.firstChild.data
