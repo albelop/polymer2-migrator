@@ -11,7 +11,7 @@ var walker;
 
 var walkerOptions = {
   followLinks: false,
-  filters: [".git", "node_modules", "bower_components", "build"]
+  filters: [".git", "node_modules", "bower_components", "build","test","coverage","demo"]
 };
 
 
