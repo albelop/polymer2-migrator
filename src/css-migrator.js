@@ -1,5 +1,6 @@
 const lodash = require("lodash/fp");
 const logger = require("./logger.js");
+const csstree = require("css-tree");
 
 const fixCss = (style, regexp, str, msg) => {
   var newStyle = style.replace(new RegExp(regexp), str);
@@ -29,21 +30,32 @@ const fixSlotted = style =>
     'Replaced "::content" selector with "::slotted".'
   );
 
-const isOldShadowStyle = style =>
-  style.includes("::shadow") || style.includes("/deep/");
-const splitRules = style => style.match(/.+?\{.+?\}/gim);
-const trimSpaces = str => str.replace(/\s+\s+/gm, "");
-const trimNewLines = str => str.replace(/(\r\n|\n|\r)/gm, "");
+const hasNoOldShadowStyle = rule => {
+  var style = csstree.generate(rule.prelude);
+  return !style.includes("::shadow") && !style.includes("/deep/");
+};
 
 const fixShadow = style => {
-  let rules = lodash.compose(splitRules, trimSpaces, trimNewLines)(style);
-  var filteredRules = rules.filter(e => !isOldShadowStyle(e));
-  if (rules.length !== filteredRules.length) {
+  var ast = csstree.parse(style);
+  let rules = ast.children;
+
+  let filteredRules = ast.children.filter(hasNoOldShadowStyle);
+  
+  filteredRules = filteredRules.map(elem => {
+    if (elem.type === "Atrule") {
+      elem.block.children = elem.block.children.filter(hasNoOldShadowStyle);
+    }
+    return elem;
+  });
+
+  if (rules.getSize() !== filteredRules.getSize()) {
     logger.verbose(
       '- Removed CSS rules with deprecated selectors "::shadow" or "/deep/").'
     );
+    ast.children = filteredRules;
   }
-  return !!filteredRules ? filteredRules.join("\n") : "";
+
+  return csstree.generate(ast);
 };
 
 const fixCustomStyleRoot = str => str.replace(/\:root/g, "html");

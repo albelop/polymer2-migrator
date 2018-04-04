@@ -11,7 +11,7 @@ var walker;
 
 var walkerOptions = {
   followLinks: false,
-  filters: [".git", "node_modules", "bower_components", "build"]
+  filters: [".git", "node_modules", "bower_components", "build","test","coverage"]
 };
 
 
@@ -31,6 +31,7 @@ walker.on("file", function(root, fileStats, next) {
     logger.verbose(`Migrating file "${filePath}"`);
     fs.readFile(filePath, "utf8", function(err, data) {
       var migratedComponent = migrator.migrate(data);
+      logger.debug(migratedComponent);
       logger.verbose(`Finished migrating file "${filePath}"`);
       if (!analyze) {
         fs.writeFile(filePath, migratedComponent, function(err) {

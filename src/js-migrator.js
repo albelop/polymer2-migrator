@@ -25,6 +25,9 @@ const method2code = method =>
     .map(e => generateCode(e))
     .join(",")})${generateCode(method.value.body)}`;
 
+const isReadyMethod = method =>
+  !!method.key && method.key.name && method.key.name === "ready";
+
 const upgradeMethods = elem => {
   if (elem.key.name.match(/^attached$/)) {
     elem.key.name = "connectedCallback";
@@ -97,11 +100,20 @@ module.exports = {
                           ${comp.listeners.value.properties
                             .map(listener2code)
                             .join("")}
-                          super.ready();
-                      }`;
+                          super.ready();`;
+
+          if (!!comp.methods) {
+            let readyFn = comp.methods.find(isReadyMethod);
+
+            if (readyFn && readyFn.value && readyFn.value.body && readyFn.value.body.body) {
+              result += generateCode(readyFn.value.body.body[0]);
+              logger.verbose('- Appended former "ready" function after new "super.ready().')
+            }
+          }
+          result += `}`;
         }
 
-        result += `${comp.methods.map(method2code).join("\n\n")}`;
+        result += `${comp.methods.filter(e => !isReadyMethod(e)).map(method2code).join("\n\n")}`;
 
         result += `} window.customElements.define(${comp.className}.is, ${
           comp.className
