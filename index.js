@@ -8,8 +8,8 @@ const logger = require("./src/logger.js");
 const migrator = require("./src/migrator.js");
 
 const sources = !!argv._.length ? argv._ : ["./"];
-const analyze = argv.analyze || false;
-logger.transports.console.level = argv.logLevel || "info";
+const analysis = argv.analysis || false;
+logger.transports.console.level = argv['log-level'] || "info";
 
 const walkerOptions = {
   followLinks: false,
@@ -31,7 +31,7 @@ const migrateFile = (filePath, next) => {
       var migratedComponent = migrator.migrate(data);
       logger.debug(migratedComponent);
       logger.verbose(`Finished migrating file "${filePath}"`);
-      if (!analyze) {
+      if (!analysis) {
         fs.writeFile(filePath, migratedComponent, function(err) {
           if (err) {
             logger.error(err);
