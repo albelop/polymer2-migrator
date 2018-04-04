@@ -1,4 +1,4 @@
-<link rel="import" href="../bower_components/polymer/poymer.html">
+<link rel="import" href="../bower_components/polymer/polymer.html">
 
 <dom-module is="paco">
 	<template>
@@ -10,6 +10,10 @@
 
 		<content>
 		</content>
+
+		<template is="dom-repeat" items="[[myItems]]">
+			item
+		</template>
 	</template>
 	<script>
 		Polymer({
