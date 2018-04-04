@@ -25,9 +25,9 @@ Examples:
 If the `--analysis` flag is used, the migrator will only analyze the component to check which migrations are possible, and generate a `migrator-analysis` file. **It will not make any changes in the component's files.**
 
 #### log-level
-Flag `--log-level` is available to define the log level of the console output.
-Available values: `error`, `warn`, `info`, `verbose`, `debug`.
+Defines the log level of the console output.
 
+Available values: `error`, `warn`, `info`, `verbose`, `debug`.
 
 
 ## How does it work?

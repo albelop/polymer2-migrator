@@ -111,7 +111,7 @@ const addMissingImports = html => {
       html =
         linkPolymerElement.replace(
           "/polymer-element.html",
-          "/lib/element/dom-if.html"
+          "/lib/elements/dom-if.html"
         ) +
         "\n" +
         html;
@@ -120,7 +120,7 @@ const addMissingImports = html => {
       html =
         linkPolymerElement.replace(
           "/polymer-element.html",
-          "/lib/element/dom-repeat.html"
+          "/lib/elements/dom-repeat.html"
         ) +
         "\n" +
         html;
