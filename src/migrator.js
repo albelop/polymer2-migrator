@@ -48,7 +48,7 @@ const upgradeNode = elem => {
       break;
     case "style":
       if (!getParentTemplate(elem)) {
-        logger.warn("You need to define the style in the dom-module template");
+        logger.info("! You need to define the style in the dom-module template");
       }
       newElement = cssMigrator.migrate(elem);
       break;
@@ -99,7 +99,7 @@ const setDomModuleId = attrs => {
     delete newAttrs.is;
     delete newAttrs.name;
     logger.verbose(
-      `- Removed decrecated patterns "is" and "name" in DOM module ()`
+      `- Removed decrecated patterns "is" and "name" in DOM module.`
     );
   }
   return newAttrs;
@@ -107,7 +107,7 @@ const setDomModuleId = attrs => {
 
 const addMissingImports = html => {
   if (!!linkPolymerElement) {
-    if (needsDomIfImport) {
+    if (needsDomIfImport && !html.includes('/lib/elements/dom-if.html')) {
       html =
         linkPolymerElement.replace(
           "/polymer-element.html",
@@ -115,8 +115,11 @@ const addMissingImports = html => {
         ) +
         "\n" +
         html;
+        logger.verbose(
+          `- Added dom-if element import`
+        );
     }
-    if (needsDomRepeatImport) {
+    if (needsDomRepeatImport && !html.includes('/lib/elements/dom-repeat.html')) {
       html =
         linkPolymerElement.replace(
           "/polymer-element.html",
@@ -124,6 +127,9 @@ const addMissingImports = html => {
         ) +
         "\n" +
         html;
+        logger.verbose(
+          `- Added dom-repeat element import`
+        );
     }
   }
   return html;

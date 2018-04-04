@@ -26,11 +26,11 @@ const walkerOptions = {
 const migrateFile = (filePath, next) => {
   if (filePath.endsWith(".html")) {
     logger.verbose(`-----------`);
-    logger.verbose(`Migrating file "${filePath}"`);
+    logger.info(`Migrating file "${filePath}"`);
     fs.readFile(filePath, "utf8", function(err, data) {
       var migratedComponent = migrator.migrate(data);
       logger.debug(migratedComponent);
-      logger.verbose(`Finished migrating file "${filePath}"`);
+      logger.info(`Finished migrating file "${filePath}"`);
       if (!analysis) {
         fs.writeFile(filePath, migratedComponent, function(err) {
           if (err) {
