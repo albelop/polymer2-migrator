@@ -73,7 +73,7 @@ const wrapCustomStyle = node => {
   delete newCustomStyleNode.attribs.is;
   node.children = [newCustomStyleNode];
   node.tagName = "custom-style";
-  delete node.attribs.is;
+  node.attribs = {};
   logger.verbose('- Wrapped custom style with "<custom-style>" tag.');
   return node;
 };
