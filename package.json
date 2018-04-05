@@ -1,13 +1,13 @@
 {
   "name": "polymer2-migrator",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Migrate your Polymer 1.x components to Polymer 2.x components",
   "main": "index.js",
   "bin": {
     "migrate-component": "index.js"
   },
   "scripts": {
-    "test": "nyc --reporter=html --reporter=text mocha --ui tdd"
+    "test": "nyc --reporter=text --reporter=lcov mocha --ui tdd"
   },
   "repository": {
     "type": "git",
