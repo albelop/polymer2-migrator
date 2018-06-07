@@ -20,6 +20,11 @@ const getExtends = behaviors =>
       )}, Polymer.Element)`
     : "Polymer.Element";
 
+const getParsedBody = elem =>
+  elem && elem.value && elem.value.body && elem.value.body.body
+    ? elem.value.body.body
+    : null;
+
 const method2code = method =>
   `${method.key.name}(${method.value.params
     .map(e => generateCode(e))
@@ -29,16 +34,25 @@ const isReadyMethod = method =>
   !!method.key && method.key.name && method.key.name === "ready";
 
 const upgradeMethods = elem => {
-  if (elem.key.name.match(/^attached$/)) {
+  if (elem.key.name === "attached") {
     elem.key.name = "connectedCallback";
+
+    elem.value.body.body.unshift(
+      esprima.parseModule("replaceWithSuper.connectedCallback();")
+    );
     logger.verbose('- Replaced "attached" method with "connectedCallback"');
   }
-  if (elem.key.name.match(/^detached$/)) {
+  if (elem.key.name === "detached") {
     elem.key.name = "disconnectedCallback";
+    elem.value.body.body.unshift(
+      esprima.parseModule("replaceWithSuper.disconnectedCallback();")
+    );
     logger.verbose('- Replaced "detached" method with "disconnectedCallback"');
   }
   return elem;
 };
+
+const replaceSuper = str => str.replace(/replaceWithSuper/g, "super");
 
 const listener2code = listener => {
   let isCompound = listener.key.value.split(".").length > 1;
@@ -76,7 +90,7 @@ module.exports = {
           behaviors: getPropertyByKey(polymerData)("behaviors") || [],
           observers: getPropertyByKey(polymerData)("observers") || [],
           listeners: getPropertyByKey(polymerData)("listeners") || {},
-          methods: getMethods(polymerData).map(upgradeMethods) || []
+          methods: getMethods(polymerData).map(upgradeMethods)
         };
 
         let result;
@@ -102,18 +116,25 @@ module.exports = {
                             .join("")}
                           super.ready();`;
 
-          if (!!comp.methods) {
+          if (!!comp.methods && !!comp.methods.length) {
             let readyFn = comp.methods.find(isReadyMethod);
 
-            if (readyFn && readyFn.value && readyFn.value.body && readyFn.value.body.body) {
-              result += generateCode(readyFn.value.body.body[0]);
-              logger.verbose('- Appended former "ready" function after new "super.ready().')
+            let body = getParsedBody(readyFn);
+            if (body) {
+              result += generateCode(body[0]);
+              logger.verbose(
+                '- Appended former "ready" function after new "super.ready().'
+              );
             }
           }
           result += `}`;
         }
 
-        result += `${comp.methods.filter(e => !isReadyMethod(e)).map(method2code).join("\n\n")}`;
+        result += `${comp.methods
+          .filter(e => !isReadyMethod(e))
+          .map(method2code)
+          .map(replaceSuper)
+          .join("\n\n")}`;
 
         result += `} window.customElements.define(${comp.className}.is, ${
           comp.className
