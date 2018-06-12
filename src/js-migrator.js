@@ -70,6 +70,7 @@ const listener2code = listener => {
 
 const replaceFire = e =>
   e.replace(/\.fire\((.*?)(?:,(.*?))?\)/g, (match, name, data) => {
+    logger.verbose('- Replaced "fire" API with "dispatchEvent".');
     return data
       ? `.dispatchEvent(new CustomEvent(${name},{bubbles:true,composed:true,detail:${data}}))`
       : `.dispatchEvent(new CustomEvent(${name},{bubbles:true,composed:true}))`;
@@ -131,7 +132,7 @@ module.exports = {
             if (body) {
               result += generateCode(body[0]);
               logger.verbose(
-                '- Appended former "ready" function after new "super.ready().'
+                '- Appended former "ready" function after new "super.ready()".'
               );
             }
           }
