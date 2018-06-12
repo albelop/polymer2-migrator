@@ -7,13 +7,25 @@ const jsMigrator = require("./js-migrator.js");
 const cssMigrator = require("./css-migrator.js");
 const logger = require("./logger.js");
 
+let needsDomIfImport;
+let needsDomRepeatImport;
+let linkPolymerElement;
+
 /* Function definitions */
 
 const isType = (...types) => e => types.includes(e.type);
 const parseSelector = selector => selector.match(/([\w-]+)/g).join("-");
 
-const html2tree = html =>
-  parse5.parseFragment(html, { treeAdapter: parse5.treeAdapters.htmlparser2 });
+const html2tree = html => {
+  let parser;
+
+  if (html.includes("<html")) {
+    parser = parse5.parse;
+  } else {
+    parser = parse5.parseFragment;
+  }
+  return parser(html, { treeAdapter: parse5.treeAdapters.htmlparser2 });
+};
 const tree2html = tree =>
   parse5.serialize(tree, { treeAdapter: parse5.treeAdapters.htmlparser2 });
 
@@ -23,7 +35,6 @@ const getParentTemplate = e =>
 
 const upgradeNode = elem => {
   let newElement = lodash.cloneDeep(elem);
-
   switch (elem.name) {
     case "dom-module":
       newElement.attribs = setDomModuleId(elem.attribs);
@@ -37,26 +48,37 @@ const upgradeNode = elem => {
       break;
     case "style":
       if (!getParentTemplate(elem)) {
-        logger.warning(
-          "You need to define the style in the dom-module template"
-        );
+        logger.info("! You need to define the style in the dom-module template");
       }
       newElement = cssMigrator.migrate(elem);
       break;
     case "script":
-      // let script = newElement.children[0].data;
-      //TODO: check if Polymer object
-      if (newElement.firstChild.data) {
+      if (newElement.firstChild && newElement.firstChild.data) {
         newElement.firstChild.data = jsMigrator.migrate(
           newElement.firstChild.data
         );
       }
       break;
     case "link":
-      newElement.attribs.href = newElement.attribs.href.replace(
-        "polymer/polymer.html",
-        "polymer/polymer-element.html"
-      );
+      if (newElement.attribs.href.includes("polymer/polymer.html")) {
+        newElement.attribs.href = newElement.attribs.href.replace(
+          "polymer/polymer.html",
+          "polymer/polymer-element.html"
+        );
+        const treeAdapter = parse5.treeAdapters.htmlparser2;
+        const docFragment = treeAdapter.createDocumentFragment();
+        treeAdapter.appendChild(docFragment, newElement);
+
+        linkPolymerElement = parse5.serialize(docFragment, {
+          treeAdapter: parse5.treeAdapters.htmlparser2
+        });
+      }
+      break;
+    case "template":
+      needsDomIfImport = elem.attribs.is === "dom-if" ? true : needsDomIfImport;
+      needsDomRepeatImport =
+        elem.attribs.is === "dom-repeat" ? true : needsDomRepeatImport;
+      break;
   }
   return newElement;
 };
@@ -77,10 +99,40 @@ const setDomModuleId = attrs => {
     delete newAttrs.is;
     delete newAttrs.name;
     logger.verbose(
-      `- Removed decrecated patterns "is" and "name" in DOM module ()`
+      `- Removed decrecated patterns "is" and "name" in DOM module.`
     );
   }
   return newAttrs;
+};
+
+const addMissingImports = html => {
+  if (!!linkPolymerElement) {
+    if (needsDomIfImport && !html.includes('/lib/elements/dom-if.html')) {
+      html =
+        linkPolymerElement.replace(
+          "/polymer-element.html",
+          "/lib/elements/dom-if.html"
+        ) +
+        "\n" +
+        html;
+        logger.verbose(
+          `- Added dom-if element import`
+        );
+    }
+    if (needsDomRepeatImport && !html.includes('/lib/elements/dom-repeat.html')) {
+      html =
+        linkPolymerElement.replace(
+          "/polymer-element.html",
+          "/lib/elements/dom-repeat.html"
+        ) +
+        "\n" +
+        html;
+        logger.verbose(
+          `- Added dom-repeat element import`
+        );
+    }
+  }
+  return html;
 };
 
 const traverseItem = node => {
@@ -92,9 +144,23 @@ const traverseItem = node => {
   return newNode;
 };
 
+const initializeMigration = () => {
+  needsDomIfImport = false;
+  needsDomRepeatImport = false;
+  linkPolymerElement = null;
+};
+
 module.exports = {
-  migrate: html =>
-    lodash.compose(pretty, tree2html, traverseItem, html2tree)(html),
+  migrate: html => {
+    initializeMigration();
+    return lodash.compose(
+      pretty,
+      addMissingImports,
+      tree2html,
+      traverseItem,
+      html2tree
+    )(html);
+  },
   migrateHtml: html => {},
   migrateCss: cssMigrator.migrate,
   migrateJs: jsMigrator.migrate

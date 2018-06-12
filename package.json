@@ -1,13 +1,13 @@
 {
   "name": "polymer2-migrator",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Migrate your Polymer 1.x components to Polymer 2.x components",
   "main": "index.js",
   "bin": {
     "migrate-component": "index.js"
   },
   "scripts": {
-    "test": "test"
+    "test": "nyc --reporter=text --reporter=lcov mocha --ui tdd"
   },
   "repository": {
     "type": "git",
@@ -30,18 +30,25 @@
   "homepage": "https://github.com/albelop/polymer2-migrator#readme",
   "dependencies": {
     "acorn": "^5.1.2",
+    "css-tree": "^1.0.0-alpha.28",
     "escodegen": "^1.9.0",
     "esprima": "^4.0.0",
     "esprima-walk": "^0.1.0",
+    "expect.js": "^0.3.1",
     "lodash": "^4.17.4",
     "parse5": "^3.0.2",
     "pretty": "^2.0.0",
     "simple-git": "^1.92.0",
     "through2": "^2.0.3",
     "walk": "^2.3.13",
-    "winston": "^2.4.1"
+    "winston": "^2.4.1",
+    "yargs": "^9.0.1"
   },
   "devDependencies": {
-    "yargs": "^9.0.1"
+    "chai": "^4.1.2",
+    "mocha": "^5.0.5",
+    "nyc": "^11.6.0",
+    "sinon": "^4.5.0",
+    "sinon-chai": "^3.1.0"
   }
 }

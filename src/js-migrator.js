@@ -2,7 +2,8 @@ const esprima = require("esprima");
 const walk = require("esprima-walk").walkAddParent;
 const lodash = require("lodash/fp");
 const logger = require("./logger.js");
-const generateCode = require("escodegen").generate;
+const generateCode = ast =>
+  require("escodegen").generate(ast, { format: { compact: true } });
 
 const lisp2pascal = str =>
   str.replace(/^([a-z])|\-([a-z0-9])/g, v => v.toUpperCase().replace("-", ""));
@@ -20,22 +21,39 @@ const getExtends = behaviors =>
       )}, Polymer.Element)`
     : "Polymer.Element";
 
+const getParsedBody = elem =>
+  elem && elem.value && elem.value.body && elem.value.body.body
+    ? elem.value.body.body
+    : null;
+
 const method2code = method =>
   `${method.key.name}(${method.value.params
     .map(e => generateCode(e))
     .join(",")})${generateCode(method.value.body)}`;
 
+const isReadyMethod = method =>
+  !!method.key && method.key.name && method.key.name === "ready";
+
 const upgradeMethods = elem => {
-  if (elem.key.name.match(/^attached$/)) {
+  if (elem.key.name === "attached") {
     elem.key.name = "connectedCallback";
+
+    elem.value.body.body.unshift(
+      esprima.parseModule("replaceWithSuper.connectedCallback();")
+    );
     logger.verbose('- Replaced "attached" method with "connectedCallback"');
   }
-  if (elem.key.name.match(/^detached$/)) {
+  if (elem.key.name === "detached") {
     elem.key.name = "disconnectedCallback";
+    elem.value.body.body.unshift(
+      esprima.parseModule("replaceWithSuper.disconnectedCallback();")
+    );
     logger.verbose('- Replaced "detached" method with "disconnectedCallback"');
   }
   return elem;
 };
+
+const replaceSuper = str => str.replace(/replaceWithSuper/g, "super");
 
 const listener2code = listener => {
   let isCompound = listener.key.value.split(".").length > 1;
@@ -49,6 +67,14 @@ const listener2code = listener => {
     listener.value.value
   }.bind(this));`;
 };
+
+const replaceFire = e =>
+  e.replace(/\.fire\((.*?)(?:,(.*?))?\)/g, (match, name, data) => {
+    logger.verbose('- Replaced "fire" API with "dispatchEvent".');
+    return data
+      ? `.dispatchEvent(new CustomEvent(${name},{bubbles:true,composed:true,detail:${data}}))`
+      : `.dispatchEvent(new CustomEvent(${name},{bubbles:true,composed:true}))`;
+  });
 
 module.exports = {
   migrate: function(html) {
@@ -73,7 +99,7 @@ module.exports = {
           behaviors: getPropertyByKey(polymerData)("behaviors") || [],
           observers: getPropertyByKey(polymerData)("observers") || [],
           listeners: getPropertyByKey(polymerData)("listeners") || {},
-          methods: getMethods(polymerData).map(upgradeMethods) || []
+          methods: getMethods(polymerData).map(upgradeMethods)
         };
 
         let result;
@@ -97,11 +123,28 @@ module.exports = {
                           ${comp.listeners.value.properties
                             .map(listener2code)
                             .join("")}
-                          super.ready();
-                      }`;
+                          super.ready();`;
+
+          if (!!comp.methods && !!comp.methods.length) {
+            let readyFn = comp.methods.find(isReadyMethod);
+
+            let body = getParsedBody(readyFn);
+            if (body) {
+              result += generateCode(body[0]);
+              logger.verbose(
+                '- Appended former "ready" function after new "super.ready()".'
+              );
+            }
+          }
+          result += `}`;
         }
 
-        result += `${comp.methods.map(method2code).join("\n\n")}`;
+        result += `${comp.methods
+          .filter(e => !isReadyMethod(e))
+          .map(method2code)
+          .map(replaceFire)
+          .map(replaceSuper)
+          .join("\n\n")}`;
 
         result += `} window.customElements.define(${comp.className}.is, ${
           comp.className
@@ -119,9 +162,3 @@ module.exports = {
     return generateCode(parsedJS);
   }
 };
-//TODO:
-// - Check existing lifecycle methods
-// - Replace this.fire API
-// - Import dom-if-, dom-bind, dom-repeat if used
-// -
-// -

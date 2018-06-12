@@ -1,19 +1,19 @@
-<link rel="import" href="../bower_components/polymer/poymer.html">
+<link rel="import" href="../bower_components/polymer/polymer.html">
 
 <dom-module is="paco">
 	<template>
 		<style is="custom-style">
-			/* In a 1.x custom-style, :root can be used to set global defaults */
-
 			:root {
 				--my-theme-color: #9C27B0;
 			}
 		</style>
 
-
-
 		<content>
 		</content>
+
+		<template is="dom-repeat" items="[[myItems]]">
+			item
+		</template>
 	</template>
 	<script>
 		Polymer({

@@ -9,21 +9,26 @@ Migrates a Polymer 1.x component to Polymer 2.x component (class based).
 
 ## Usage
 
-To migrate the component in a folder, run the following command in the root folder of the component:
+    migrate-component [<folder>|<file>] [--analysis] [--log-level=level]
+
+Examples:
 
     migrate-component
+    migrate-component ./src
+    migrate-component file_1.html file_2.html --analysis
+    migrate-component --log-level=verbose
 
-You can also target a specific folder to migrate.
+### Options
 
-    migrate-component <component_root_folder>
+#### analysis
 
-If the `--analyze` flag is used, the migrator will only analyze the component to check which migrations are possible, and generate a `migrator-analysis` file. It will not make any changes in the component's files.
+If the `--analysis` flag is used, the migrator will only analyze the component to check which migrations are possible, and generate a `migrator-analysis` file. **It will not make any changes in the component's files.**
 
-    migrate-component --analyze
+#### log-level
+Defines the log level of the console output.
 
-Flag `--logLevel` is available to define the log level of the console output:
+Available values: `error`, `warn`, `info`, `verbose`, `debug`.
 
-    migrate-component --logLevel=verbose
 
 ## How does it work?
 
@@ -51,14 +56,15 @@ The polymer2-migrator applies the following changes to upgrade your Polymer 1.x 
 
 - :white_check_mark: Convert to class syntax.
 - :white_check_mark: Add listeners to ready function.
-- :white_check_mark: Behaviors as mixins
+- :white_check_mark: Behaviors as mixins.
+- :white_check_mark: Automatically import `dom-if.html` and `dom-repeat.html` if needed.
 
 [Source](https://www.polymer-project.org/2.0/docs/upgrade#polymer-dom-apis)
 
 ### Common utility APIs
+- :white_check_mark: fire - Replaces the `fire` method with `dispatchEvent` and adapts the syntax.
 - :white_circle: async
 - :white_circle: debounce
-- :white_circle: fire
 - :white_circle: importHref
 - :white_circle: $$
 
