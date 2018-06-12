@@ -1,3 +1,12 @@
+<a name="1.1.0"></a>
+## 1.1.0 (2018-06-12)
+
+
+#### Features
+
+* Replace fire with dispatchEvent ([5c83409c](git+https://github.com/albelop/polymer2-migrator.git/commit/5c83409c))
+
+
 <a name="1.0.2"></a>
 ### 1.0.2 (2018-06-07)
 
