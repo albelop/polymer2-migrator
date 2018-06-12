@@ -1,6 +1,6 @@
 {
   "name": "polymer2-migrator",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Migrate your Polymer 1.x components to Polymer 2.x components",
   "main": "index.js",
   "bin": {
