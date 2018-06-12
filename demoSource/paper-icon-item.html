@@ -136,11 +136,14 @@ Custom property               | Description                                    |
           this.married = !this.married;
         },
         doSomething: function () {
+          this.$.contentIcon.fire('sample-event', { payload: 'some data', valid: true })
           console.log('This function does something');
+
         },
 
         greet: function (name) {
           console.log('Hello ' + name);
+          this.fire('greeting');
         }
       });
     })(window, MYVAR)

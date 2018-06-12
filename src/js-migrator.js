@@ -2,7 +2,8 @@ const esprima = require("esprima");
 const walk = require("esprima-walk").walkAddParent;
 const lodash = require("lodash/fp");
 const logger = require("./logger.js");
-const generateCode = require("escodegen").generate;
+const generateCode = ast =>
+  require("escodegen").generate(ast, { format: { compact: true } });
 
 const lisp2pascal = str =>
   str.replace(/^([a-z])|\-([a-z0-9])/g, v => v.toUpperCase().replace("-", ""));
@@ -66,6 +67,13 @@ const listener2code = listener => {
     listener.value.value
   }.bind(this));`;
 };
+
+const replaceFire = e =>
+  e.replace(/\.fire\((.*?)(?:,(.*?))?\)/g, (match, name, data) => {
+    return data
+      ? `.dispatchEvent(new CustomEvent(${name},{bubbles:true,composed:true,detail:${data}}))`
+      : `.dispatchEvent(new CustomEvent(${name},{bubbles:true,composed:true}))`;
+  });
 
 module.exports = {
   migrate: function(html) {
@@ -133,6 +141,7 @@ module.exports = {
         result += `${comp.methods
           .filter(e => !isReadyMethod(e))
           .map(method2code)
+          .map(replaceFire)
           .map(replaceSuper)
           .join("\n\n")}`;
 
@@ -152,9 +161,3 @@ module.exports = {
     return generateCode(parsedJS);
   }
 };
-//TODO:
-// - Check existing lifecycle methods
-// - Replace this.fire API
-// - Import dom-if-, dom-bind, dom-repeat if used
-// -
-// -
