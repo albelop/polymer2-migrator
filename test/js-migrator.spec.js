@@ -9,14 +9,14 @@ const logger = require("../src/logger.js");
 
 const wrapInScript = fragment => `Polymer(${fragment})`;
 
-suite("Javascript", function() {
+suite("Javascript", function () {
   let loggerSpy;
 
-  teardown(function() {
+  teardown(function () {
     if (!!loggerSpy) loggerSpy.restore();
   });
 
-  test("Converts to class form", function() {
+  test("Converts to class form", function () {
     loggerSpy = sinon.spy(logger, "verbose");
     const polymerConfig = `{ is: "my-class-name" }`;
     const fragment = wrapInScript(polymerConfig);
@@ -30,7 +30,7 @@ suite("Javascript", function() {
     expect(loggerSpy).called;
     expect(loggerSpy).calledWith('- Converted component "my-class-name" to class component "MyClassName"');
   });
-  test("Adds properties as static getter", function() {
+  test("Adds properties as static getter", function () {
     const polymerConfig = `{
       is: "my-class-name",
       properties:{
@@ -51,7 +51,7 @@ suite("Javascript", function() {
 
     expect(esprima(jsMigrator.migrate(fragment))).eql(esprima(expected));
   });
-  test("Adds observers as static getter", function() {
+  test("Adds observers as static getter", function () {
     const polymerConfig = `{
       is: "my-class-name",
       observers:[
@@ -72,7 +72,7 @@ suite("Javascript", function() {
 
     expect(esprima(jsMigrator.migrate(fragment))).eql(esprima(expected));
   });
-  test("Set behaviors as mixins", function() {
+  test("Set behaviors as mixins", function () {
     const polymerConfig = `{ 
       is: "my-class-name",
       behaviors:[Behavior1, Behavior2]
@@ -87,7 +87,7 @@ suite("Javascript", function() {
     expect(esprima(jsMigrator.migrate(fragment))).eql(esprima(expected));
   });
 
-  test("Set listeners in ready function", function() {
+  test("Set listeners in ready function", function () {
     const polymerConfig = `{ 
       is: "my-class-name",
       listeners:{
@@ -110,7 +110,7 @@ suite("Javascript", function() {
     expect(esprima(jsMigrator.migrate(fragment))).eql(esprima(expected));
   });
 
-  test("Add ready initialization ", function() {
+  test("Add ready initialization ", function () {
     const polymerConfig = `{ 
       is: "my-class-name",
       listeners:{
@@ -133,7 +133,30 @@ suite("Javascript", function() {
     expect(esprima(jsMigrator.migrate(fragment))).eql(esprima(expected));
   });
 
-  test("Convert attached to connectedCallback", function() {
+  test("Convert .fire to dispatchEvent", function () {
+    const polymerConfig = `{ 
+      is: "my-class-name",
+      myFunc:function(){this.fire('my-event');},
+      otherFunc:function(){this.$.element.fire('another-event',data); someOtherFunc();}
+    }`;
+    const fragment = wrapInScript(polymerConfig);
+
+    const expected = `class MyClassName extends Polymer.Element {
+                            static get is() {return 'my-class-name';}
+                            myFunc(){
+                              this.dispatchEvent(new CustomEvent('my-event',{bubbles:true, composed:true}));
+                            }
+                            otherFunc(){
+                              this.$.element.dispatchEvent(new CustomEvent('another-event',{bubbles:true, composed:true, detail:data}));
+                              someOtherFunc();
+                            }
+                      }
+                      window.customElements.define(MyClassName.is, MyClassName);`;
+
+    expect(esprima(jsMigrator.migrate(fragment))).eql(esprima(expected));
+  });
+
+  test("Convert attached to connectedCallback", function () {
     const polymerConfig = `{ 
       is: "my-class-name",
       attached:function(){doSomething();}
@@ -151,7 +174,7 @@ suite("Javascript", function() {
 
     expect(esprima(jsMigrator.migrate(fragment))).eql(esprima(expected));
   });
-  test("Convert detached to disconnectedCallback", function() {
+  test("Convert detached to disconnectedCallback", function () {
     const polymerConfig = `{ 
       is: "my-class-name",
       detached:function(){doSomething();}
@@ -170,7 +193,7 @@ suite("Javascript", function() {
     expect(esprima(jsMigrator.migrate(fragment))).eql(esprima(expected));
   });
 
-  test("Convert functions to methods", function() {
+  test("Convert functions to methods", function () {
     const polymerConfig = `{ 
       is: "my-class-name",
       myPublicFunction:function(){doSomething();},
