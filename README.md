@@ -56,15 +56,15 @@ The polymer2-migrator applies the following changes to upgrade your Polymer 1.x 
 
 - :white_check_mark: Convert to class syntax.
 - :white_check_mark: Add listeners to ready function.
-- :white_check_mark: Behaviors as mixins
-- :white_check_mark: Automatically import `dom-if.html` and `dom-repeat.html` if needed
+- :white_check_mark: Behaviors as mixins.
+- :white_check_mark: Automatically import `dom-if.html` and `dom-repeat.html` if needed.
 
 [Source](https://www.polymer-project.org/2.0/docs/upgrade#polymer-dom-apis)
 
 ### Common utility APIs
+- :white_check_mark: fire - Replaces the `fire` method with `dispatchEvent` and adapts the syntax.
 - :white_circle: async
 - :white_circle: debounce
-- :white_circle: fire
 - :white_circle: importHref
 - :white_circle: $$
 
