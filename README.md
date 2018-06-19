@@ -66,7 +66,7 @@ The polymer2-migrator applies the following changes to upgrade your Polymer 1.x 
 - :white_circle: async
 - :white_circle: debounce
 - :white_circle: importHref
-- :white_circle: $$
+- :white_check_mark: $$ - Replaces the `$$('selector')` syntax with `shadowRoot.querySelector('selector')`.
 
 [Source](https://www.polymer-project.org/2.0/docs/upgrade#common-utility-apis)
 
