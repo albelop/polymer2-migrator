@@ -138,7 +138,7 @@ Custom property               | Description                                    |
         doSomething: function () {
           this.$.contentIcon.fire('sample-event', { payload: 'some data', valid: true })
           console.log('This function does something');
-
+          this.$$('.dynamically-loaded-element').someProp = false;
         },
 
         greet: function (name) {

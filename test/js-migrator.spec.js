@@ -214,4 +214,23 @@ suite("Javascript", function () {
 
     expect(esprima(jsMigrator.migrate(fragment))).eql(esprima(expected));
   });
+
+  test("Converts $$ to querySelector", function () {
+    const polymerConfig = `{
+      is: "my-class-name",
+      myPublicFunction:function(){this.$$('some-selector').doSomething();},
+    }`;
+    const fragment = wrapInScript(polymerConfig);
+
+    const expected = `class MyClassName extends Polymer.Element {
+                            static get is() {return 'my-class-name';}
+                            myPublicFunction(){
+                              this.shadowRoot.querySelector('some-selector').doSomething();
+                            }
+                      }
+                      window.customElements.define(MyClassName.is, MyClassName);`;
+
+    expect(esprima(jsMigrator.migrate(fragment))).eql(esprima(expected));
+  });
+
 });

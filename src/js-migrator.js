@@ -76,6 +76,11 @@ const replaceFire = e =>
       : `.dispatchEvent(new CustomEvent(${name},{bubbles:true,composed:true}))`;
   });
 
+  const replaceDoubleDollar = e => e.replace(/\.\$\$\(/g, (match, selector) => {
+    logger.verbose('- Replaced $$ selector with shadow DOM query selector');
+    return '.shadowRoot.querySelector('
+  })
+
 module.exports = {
   migrate: function(html) {
     let parsedJS = esprima.parseScript(html);
@@ -143,6 +148,7 @@ module.exports = {
           .filter(e => !isReadyMethod(e))
           .map(method2code)
           .map(replaceFire)
+          .map(replaceDoubleDollar)
           .map(replaceSuper)
           .join("\n\n")}`;
 
