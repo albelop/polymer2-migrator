@@ -1,3 +1,12 @@
+<a name="1.2.0"></a>
+## 1.2.0 (2018-06-20)
+
+
+#### Features
+
+* Replace test syntax with shadow DOM query selector ([8fbc56b3](git+https://github.com/albelop/polymer2-migrator.git/commit/8fbc56b3))
+
+
 <a name="1.1.0"></a>
 ## 1.1.0 (2018-06-12)
 
