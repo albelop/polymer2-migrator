@@ -1,27 +1,33 @@
-<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
 
-<dom-module is="paco">
-	<template>
-		<style is="custom-style">
-			:root {
-				--my-theme-color: #9C27B0;
-			}
-		</style>
+<dom-module id="paco">
+  <template>
+    <custom-style>
+      <style>
+        :host>* {
+          --my-theme-color: #9C27B0
+        }
+      </style>
+    </custom-style>
 
-		<content>
-		</content>
+    <slot>
+    </slot>
 
-		<template is="dom-repeat" items="[[myItems]]">
-			item
-		</template>
-	</template>
-	<script>
-		Polymer({
-			is: "paco",
-
-			attached: function () {
-				console.log('attached');
-			}
-		});
-	</script>
+    <template is="dom-repeat" items="[[myItems]]">
+      item
+    </template>
+  </template>
+  <script>
+    class Paco extends Polymer.Element {
+      static get is() {
+        return 'paco';
+      }
+      connectedCallback() {
+        super.connectedCallback();
+        console.log('attached');
+      }
+    }
+    window.customElements.define(Paco.is, Paco);
+  </script>
 </dom-module>

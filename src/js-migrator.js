@@ -53,6 +53,7 @@ const upgradeMethods = elem => {
   return elem;
 };
 
+
 const replaceSuper = str => str.replace(/replaceWithSuper/g, "super");
 
 const listener2code = listener => {
@@ -68,13 +69,30 @@ const listener2code = listener => {
   }.bind(this));`;
 };
 
-const replaceFire = e =>
-  e.replace(/\.fire\((.*?)(?:,(.*?))?\)/g, (match, name, data) => {
-    logger.verbose('- Replaced "fire" API with "dispatchEvent".');
-    return data
-      ? `.dispatchEvent(new CustomEvent(${name},{bubbles:true,composed:true,detail:${data}}))`
-      : `.dispatchEvent(new CustomEvent(${name},{bubbles:true,composed:true}))`;
-  });
+
+
+const replaceFire = method => {
+  debugger;
+  const methodBody = getParsedBody(method);
+
+  if (methodBody){
+    methodBody.forEach(e => {
+      if (e.expression.callee.name === 'fire'){
+        debugger;
+      }
+    })
+  }
+
+
+  return method;
+}
+// const replaceFire = e =>
+//   e.replace(/\.fire\((.*?)(?:,(.*?))?\)/g, (match, name, data) => {
+//     logger.verbose('- Replaced "fire" API with "dispatchEvent".');
+//     return data
+//       ? `.dispatchEvent(new CustomEvent(${name},{bubbles:true,composed:true,detail:${data}}))`
+//       : `.dispatchEvent(new CustomEvent(${name},{bubbles:true,composed:true}))`;
+//   });
 
 module.exports = {
   migrate: function(html) {
@@ -141,8 +159,8 @@ module.exports = {
 
         result += `${comp.methods
           .filter(e => !isReadyMethod(e))
-          .map(method2code)
           .map(replaceFire)
+          .map(method2code)
           .map(replaceSuper)
           .join("\n\n")}`;
 

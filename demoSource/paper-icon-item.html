@@ -1,3 +1,4 @@
+<link rel="import" href="../polymer/lib/elements/dom-if.html">
 <!--
 @license
 Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
@@ -8,7 +9,7 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../polymer/polymer-element.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../paper-styles/typography.html">
 <link rel="import" href="paper-item-behavior.html">
@@ -50,102 +51,96 @@ Custom property               | Description                                    |
   <template>
     <style include="paper-item-shared-styles"></style>
     <style>
-      :root {
-        color: red;
+      :host>* {
+        color: red
       }
 
       :host {
-        @apply(--layout-horizontal);
-        @apply(--layout-center);
-        @apply(--paper-font-subhead);
-
-        @apply(--paper-item);
-        @apply(--paper-icon-item);
+        @apply --layout-horizontal;
+        @apply --layout-center;
+        @apply --paper-font-subhead;
+        @apply --paper-item;
+        @apply --paper-icon-item;
       }
 
-      .content-icon /deep/ img {
-        display: block;
+      ::slotted(span) {
+        background: green
       }
 
-      .content-icon ::shadow img {
-        display: block;
+      ::slotted(h1) {
+        background: green
       }
 
-      ::content>span {
-        background: green;
-      }
-
-      ::content h1 {
-        background: green;
-      }
-
-      @media screen and (max-width: 360px) {
+      @media screen and (max-width:360px) {
         .content-icon {
-          @apply(--layout-horizontal);
-          @apply(--layout-center);
-
-          width: var(--paper-item-icon-width, --paper-item-icon-default-width);
-          @apply(--paper-item-icon);
+          @apply --layout-horizontal;
+          @apply --layout-center;
+          width: var(--paper-item-icon-width, var(--paper-item-icon-default-width));
+          @apply --paper-item-icon;
         }
-        .content-icon /deep/ img {
-          display: inline-block;
-        }
-        ::content h1 {
-          background: yellow;
+        ::slotted(h1) {
+          background: yellow
         }
       }
     </style>
 
     <div id="contentIcon" class="content-icon">
-      <content select="[item-icon]"></content>
+      <slot name="item-icon"></slot>
     </div>
 
     <template is="dom-if" if="married">This is true</template>
 
-    <content></content>
+    <slot></slot>
   </template>
 
   <script>
-
     var MYVAR = window.MYVAR || {};
-
-    (function (window, myVar) {
-
-      Polymer({
-        is: 'paper-icon-item',
-        properties: {
-          name: String,
-          married: {
-            type: Boolean,
-            value: false
-          }
-        },
-        observers: ['greet(name)'],
-        listeners: {
-          'tap': 'doSomething',
-          'contentIcon.click': '_myPrivateMethod'
-        },
-        behaviors: [
-          Polymer.PaperItemBehavior
-        ],
-
-        ready: function () {
-          console.log('Ready')
-        },
-        _myPrivateMethod: function () {
+    (function(window, myVar) {
+      class PaperIconItem extends Polymer.mixinBehaviors([Polymer.PaperItemBehavior], Polymer.Element) {
+        static get is() {
+          return 'paper-icon-item';
+        }
+        static get properties() {
+          return {
+            name: String,
+            married: {
+              type: Boolean,
+              value: false
+            }
+          };
+        }
+        static get observers() {
+          return ['greet(name)'];
+        }
+        ready() {
+          this.addEventListener('tap', this.doSomething.bind(this));
+          this.$.contentIcon.addEventListener('click', this._myPrivateMethod.bind(this));
+          super.ready();
+          console.log('Ready');
+        }
+        _myPrivateMethod() {
           this.married = !this.married;
-        },
-        doSomething: function () {
-          this.$.contentIcon.fire('sample-event', { payload: 'some data', valid: true })
+        }
+        doSomething() {
+          this.$.contentIcon.fire('sample-event', {
+            payload: 'some data',
+            valid: true
+          });
           console.log('This function does something');
-
-        },
-
-        greet: function (name) {
+          this.fire('event-name', {
+            myData: 'some other data',
+            moreOpts: true
+          }, {
+            cancellable: true,
+            bubbles: false
+          });
+        }
+        greet(name) {
           console.log('Hello ' + name);
           this.fire('greeting');
         }
-      });
-    })(window, MYVAR)
+      }
+      window.customElements.define(PaperIconItem.is, PaperIconItem);
+    }(window, MYVAR));
   </script>
 </dom-module>

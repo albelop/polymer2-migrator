@@ -1,20 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-    <style is="custom-style" include="some-external-styles">
-        :root {
-            --my-theme-color: #9C27B0;
-        }
-    </style>
-</head>
+  </head>
 
-<body>
+  <body>
+    <custom-style>
+      <style include="some-external-styles">
+        :host>* {
+          --my-theme-color: #9C27B0
+        }
+      </style>
+    </custom-style>
+
+
+
     This is a normal HTML file, like demo files.
-</body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </body>
 
 </html>
